@@ -30,7 +30,9 @@ app.get('/api/timestamp/:date', function (req, res) {
 app.get('/api/whoami', function (req, res) {
   let result = {ipaddress: null, language: null, software: null};
   
-  result.ipaddress = req.ip;
+  var ip = req.ip.split(':');
+  ip = ip[ip.length-1];
+  result.ipaddress = ip;
 
   result.language = req.headers["accept-language"].split(",")[0];
 
