@@ -130,3 +130,25 @@ app.get('/api/latest/image-search', function(req, res){
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(imgSearchDB, null, 2));
 });
+
+// LAST EXERCISE, YAY!
+// this one is to receive a file upload then respond with a JSON containing the size of the file
+const multer = require('multer');
+
+app.get('/api/upload-file', function (req, res){
+  var html = "<h4>Submit a file to view get its size in a JSON response</h4>";
+  html += `<form action="/api/upload-file" method="POST" enctype="multipart/form-data">`; 
+  html += `<input type="file" name="file"/>`; 
+  html += `<button type="submit">Submit the file!</button>`
+  html += `</form>`;
+
+  res.send(html);
+});
+
+var upload = multer();
+app.post('/api/upload-file', upload.single("file"), function (req, res){
+
+  var result = {filename: req.file.originalname, size: req.file.size};
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(result, null, 2));
+});
