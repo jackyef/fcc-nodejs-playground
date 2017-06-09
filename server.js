@@ -43,3 +43,31 @@ app.get('/api/whoami', function (req, res) {
   
   res.json(result);
 });
+
+
+const validUrl = require('valid-url');
+const randomstring = require("randomstring");
+let urlDB = {};
+app.get('/api/shorten-url/:url(*)', function (req, res){
+  var url = req.params.url;
+  if(!validUrl.isWebUri(url)) res.send("Please provide a valid URL!");
+
+  var hash = randomstring.generate(7);
+  while(urlDB.hasOwnProperty(hash)){
+    hash = randomString.generate(7);
+  }
+  urlDB[hash] = url;
+
+  let result = {original_url: url, short_url: req.hostname+"/api/shortened-url/"+hash};
+  console.log(urlDB);
+
+  res.json(result);
+});
+
+app.get('/api/shortened-url/:hash', function (req, res){
+  var hash = req.params.hash
+  if(urlDB.hasOwnProperty(hash)){
+    res.redirect(urlDB[req.params.hash]);
+  }
+  res.send("URL is not in database");
+});
