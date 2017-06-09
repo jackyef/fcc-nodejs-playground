@@ -84,6 +84,44 @@
             https://www.google.com
             </code>
     <hr/>
+    <h3 class="header">
+                API Basejump: Image Search API (Powered by Bing API)
+            </h3>
+            <h4>Use it like this:</h4>
+            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/image-search/[your-search-query-here]</code><br>
+            <h4>Example output:</h4>
+            <pre>[
+    {
+        "url": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=R8IBlTOjdg7OiiJ5E7ilu_qaKuN9RkUCiYuthfxIbJM&v=1&r=http%3a%2f%2fupload.wikimedia.org%2fwikipedia%2fcommons%2f3%2f37%2fWikipedia-lolcat.jpg&p=DevEx,5008.1",
+        "snippet": "Lolcat Internet Lolcat-musical aufgefhrt.",
+        "thumbnail": "https://tse3.mm.bing.net/th?id=OIP.4im_k8xNl17lU8k2RJaLSAEsDw&pid=Api",
+        "context": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=kgddTvZlGDEyjWVYoMkSbjnJ8m27rEZlVdDzUMZxxG8&v=1&r=http%3a%2f%2fimgarcade.com%2f1%2flolcat-internet&p=DevEx,5007.1"
+    },
+    {
+        "url": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=DZswcKsAandL2_jQyybNdWIzPgEow9_1F6gYZx6A6w4&v=1&r=http%3a%2f%2f1.bp.blogspot.com%2f_LvWzMHLToJ4%2fTHyP1jxIHyI%2fAAAAAAAABTo%2fjXyRYJkHojk%2fs1600%2fcute-lolcat-ears-hear-you.jpg&p=DevEx,5014.1",
+        "snippet": "Republic Of Durian: LOLcat",
+        "thumbnail": "https://tse4.mm.bing.net/th?id=OIP.l121UK0zVNAVa-NSZkdmAAEsDg&pid=Api",
+        "context": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=km7GgEx1nbxz_xgEJ5YM12iabiFpHonAb6qGzFEFnPA&v=1&r=http%3a%2f%2fivan-tai.blogspot.com%2f2010%2f08%2flolcat.html&p=DevEx,5013.1"
+    },
+    ...
+]</pre>
+            <h4>See search history here:</h4>
+            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/latest/image-search/</code><br>
+            <h4>Example of search history:</h4>
+<pre>[
+  {
+    "term": "lolcat",
+    "when": "2017-06-09T09:08:30.921Z"
+  },
+  {
+    "term": "freecodecamp",
+    "when": "2017-06-09T09:07:12.454Z"
+  },
+  ...
+]
+</pre>
+            <br/>
+    <hr/>
   <div class="social-buttons">
     by jackyef
     <a href="https://github.com/jackyef/" target="_blank"><br/>

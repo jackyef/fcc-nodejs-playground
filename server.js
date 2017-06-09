@@ -65,9 +65,68 @@ app.get('/api/shorten-url/:url(*)', function (req, res){
 });
 
 app.get('/api/shortened-url/:hash', function (req, res){
-  var hash = req.params.hash
+  var hash = req.params.hash;
   if(urlDB.hasOwnProperty(hash)){
     res.redirect(urlDB[req.params.hash]);
   }
   res.send("URL is not in database");
+});
+
+// If you are seeing this and thought to yourself "Hey, free key!",
+// well, you're out of luck. This key only limits to 3 USD/month 
+// and it won't go over the limit at all 
+
+var bingApiKey = "93f9b3ff8af84047998e53be764e5904";
+const request = require('request');
+const fs = require('fs');
+var imgSearchDB = [];
+fs.readFile("./imgSearchDB.json", function(error, data){
+  if(!error) imgSearchDB = JSON.parse(data);
+});
+
+app.get('/api/image-search/:query(*)', function(req, res){
+  var result;
+  var endpoint = "https://api.cognitive.microsoft.com/bing/v5.0/images/search?count=10";
+  var query = req.params.query;
+  var offset = req.query.offset || "0";
+  var url = endpoint + "&q="+ encodeURI(query);
+  url += "&offset="+ encodeURI(offset);
+
+  var options = {
+    url: url,
+    headers: {
+      'Ocp-Apim-Subscription-Key': bingApiKey,
+      'Accept': 'application/json',
+    }
+  };
+
+  request(options, function (error, response, body) {
+    // console.log('error:', error); // Print the error if one occurred
+    // console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+    // console.log('body:', body); // Print the HTML for the Google homepage.
+    var received = JSON.parse(body).value;
+    result = [];
+    received.forEach((v) => {
+      var current = {
+        url: v.contentUrl,
+        snippet: v.name,
+        thumbnail: v.thumbnailUrl,
+        context: v.hostPageUrl,
+      };
+      result.push(current);
+    });
+  
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(result, null, 2));
+  });
+
+  var record = {term: query, when: new Date().toISOString() };
+  imgSearchDB.unshift(record);
+  // save to file (as database);
+  fs.writeFile("./imgSearchDB.json", JSON.stringify(imgSearchDB));
+});
+
+app.get('/api/latest/image-search', function(req, res){
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(imgSearchDB, null, 2));
 });
