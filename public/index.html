@@ -1,0 +1,96 @@
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Request Header Parser microservice</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <style>
+            .social-buttons{
+            text-align: right;
+            }
+            a { 
+            text-decoration: none;
+            color: white !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>jackyef's nodejs playground</h1>
+            <p>
+                Below are the list of API created for freecodecamp exercises
+            </p>
+            <hr/>
+            <h3 class="header">
+                API Basejump: Request Header Parser microservice
+            </h3>
+            <blockquote>
+                User stories:
+                <ul>1) I can pass a string as a parameter, and it will check to see whether that string 
+                contains either a unix timestamp or a natural language date (example: January 1, 2016)</ul>
+                <ul>2) If it does, it returns both the Unix timestamp and the natural language form of that date.</ul>
+                <ul>3) If it does not contain a date or Unix timestamp, it returns null for those properties.</ul>
+            </blockquote>
+            <h4>Go to:</h4>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/api/timestamp/1450137600
+            </code>
+            <br/>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/api/timestamp/December%2015%2C%202015
+            </code>
+            <br>
+            <h4>Example output:</h4>
+            <code>
+                {
+                  "unix": 1450137600,
+                  "natural": "December 15, 2015"
+                }
+            </code>
+            <hr/>
+            <h3 class="header">
+                API Basejump: Request Header Parser microservice
+            </h3>
+            <h4>Go to:</h4>
+            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/whoami</code><br>
+            <h4>Example output:</h4>
+            <code>
+                {
+                  "ipaddress":"109.39.153.13",
+                  "language":"en-US",
+                  "software":"Windows NT 10.0; Win64; x64"
+                }
+            </code>
+    <hr/>
+  <div class="social-buttons">
+    by jackyef
+    <a href="https://github.com/jackyef/" target="_blank"><br/>
+      <button class="btn" style="background-color: rgb(36,41,46);">
+                        <span class="fa fa-github " style="min-width: 1em;"></span>
+                    </button></a>
+    <a href="http://codepen.io/jackyef/pens/public/" target="_blank">
+      <button class="btn" style="background-color: #111;">
+                        <span class="fa fa-codepen " style="min-width: 1em"></span>
+                    </button></a>
+    <a href="https://www.freecodecamp.com/jackyef" target="_blank">
+      <button class="btn" style="background-color: rgb(0,100,0);">
+                        <span class="fa fa-free-code-camp " style="min-width: 1em"></span>
+                    </button></a>
+    <a href="https://facebook.com/zhouyongchao" target="_blank">
+      <button class="btn" style="background-color: #3b5998;">
+                        <span class="fa fa-facebook " style="min-width: 1em"></span>
+                    </button></a>
+    <a href="https://instagram.com/jackyef_" target="_blank">
+      <button class="btn" style="background-color: #3F729B">
+                        <span class="fa fa-instagram " style="min-width: 1em"></span>
+                    </button></a>
+    <a href="https://www.linkedin.com/in/jacky-efendi-094643a1/" target="_blank">
+      <button class="btn" style="background-color: #0077B5;">
+                        <span class="fa fa-linkedin " style="min-width: 1em"></span>
+                    </button></a>
+  </div>
+        </div>
+        <br/>
+    </body>
+</html>

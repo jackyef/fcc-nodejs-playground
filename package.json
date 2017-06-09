@@ -1,0 +1,24 @@
+{
+  "name": "fcc-nodejs-playground-jackyef",
+  "version": "1.0.0",
+  "description": "Nodejs playground for freeCodeCamp Project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "to be added"
+  },
+  "keywords": [
+    "freeCodeCamp",
+    "expressjs",
+    "nodejs"
+  ],
+  "author": "Jacky Efendi",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.15.3",
+    "moment": "^2.18.1"
+  }
+}
