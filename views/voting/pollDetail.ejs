@@ -12,10 +12,10 @@
         var poll = (<%- JSON.stringify(poll) %>);
         var array = [];
         array.push(["Vote content", "Vote count"]);
-
-        poll.options.forEach((option,i) => {
-          array.push([option.content, option.votes]);
-        }); 
+        
+        for(var key in poll.options){
+          array.push([poll.options[key].content, poll.options[key].votes]);
+        }; 
         var data = google.visualization.arrayToDataTable(array);
 
         var options = {

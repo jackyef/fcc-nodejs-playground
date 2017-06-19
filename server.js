@@ -6,7 +6,7 @@ const session = require('express-session');
 const app = express();
 const moment = require('moment');
 const port = process.env.PORT || "8000";
-const mongoUrl = process.env.PROD_MONGODB;
+const mongoUrl = process.env.PROD_MONGODB || "mongodb://jackyef3:jackyef123@ds145669.mlab.com:45669/voting_app_db";
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
