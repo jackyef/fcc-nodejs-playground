@@ -494,12 +494,12 @@ app.get('/voting-app/initDB', function (req, res){
 // End of voting app
 
 // Start of nightlife coordination app
-var yelpApiId = process.env.YELP_API_ID;
-var yelpApiSecret = process.env.YELP_API_SECRET;
+var yelpApiId = process.env.YELP_API_ID ;
+var yelpApiSecret = process.env.YELP_API_SECRET ;
 var cachedToken;
 
-var fbAppId = process.env.FB_APP_ID;
-var fbAppSecret = process.env.FB_APP_SECRET;
+var fbAppId = process.env.FB_APP_ID ;
+var fbAppSecret = process.env.FB_APP_SECRET ;
 
 
 app.get('/nightlife-app', function (req, res){
@@ -552,7 +552,10 @@ app.get('/nightlife-app/api/search', function(req, res){
         }
       };
     request(opt, function (error, response, body) {
-      var received = JSON.parse(body);
+      var received = {error: "API didn't respond" };
+      if(body){
+        received = JSON.parse(body);
+      }
       
       res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify(received, null, 2));
