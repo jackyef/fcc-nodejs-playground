@@ -1,0 +1,329 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title><%= title %></title>
+        <link href="/css/bootstrap.css" rel="stylesheet" /> 
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" /> 
+    <style>
+    #loading{
+      display: hidden;
+      opacity: 0;
+      transition: opacity 400ms;
+      text-align: center;
+      margin-top: 1em;
+      font-size: 2em;
+    }
+    .business-entry img{
+      border-radius: 50%;
+      height: 8em;
+      width: 8em;
+    }
+    @media (max-width: 600px){
+      .business-entry img{
+        height: 6em;
+        width: 6em;
+      }
+    }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">fcc-nightlife-app</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <!--<li class=""><a href="#">Home</a></li>-->
+      </ul>
+    </div>
+  </div>
+</nav>
+  
+<div class="container">    
+  <div class="row">
+    <div class="col-sm-12">
+      <center>
+        <h1>Bar location finder</h1>
+        <h5>Hi <span id="username">Guest</span>! Type in your location and we will provide you with recommendations!</h5>
+        <small>powered by <a href="https://www.yelp.com">Yelp</a></small>
+        <br/>
+        <br/>
+        <div class="col-xs-10 col-xs-offset-1">
+          <div class="input-group input-group-lg">
+            <input class="form-control" type="text" id="search-query" placeholder="Type in a name of location e. g.: New York, London, etc"/>
+            <span class="input-group-btn">
+              <button disabled id="search-button" class="btn btn-info">
+                <i class="fa fa-search"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+      </center>
+    </div>
+  </div>
+  <div class="row">
+    <div id="loading"><i class="fa fa-5x fa-circle-o-notch fa-spin"></i></div>
+    <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2" id="result">
+    </div>
+  </div>
+</div>
+
+<!-- include footer -->
+
+</body>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/js/bootstrap.js"></script>
+    <script>
+      var searchButton = document.querySelector("#search-button");
+      var searchQuery = document.querySelector("#search-query");
+      var result = $("#result");
+      var loading = $("#loading");
+      var username = $("#username");
+      var fbUid;
+      
+      searchQuery.addEventListener("keypress", function(e){
+        if(e.keyCode == 13 && !searchButton.disabled){
+          fetchBusinesses();
+        }
+      });
+
+      searchButton.addEventListener("click", function(e){
+          fetchBusinesses();
+      });
+
+      function fetchBusinesses(){
+        result.html("");
+        loading.show();
+        loading.css("opacity", "1");
+
+        var query = searchQuery.value;
+        var hostname = "<%- req.hostname %>";
+        var path = "/nightlife-app/api/search?term=bar&location="+query;
+        var url = path;
+
+        $.getJSON(url, function(data){
+          var businesses = data.businesses;
+          var output = "<h2>Search results: </h2>";
+          var requests = [];
+          
+          if(!businesses || businesses.length < 1){
+            output += `<center>Oops, we can't find any location registered on Yelp around ${query}.</center>`;
+            loading.css("opacity", "0");
+            setTimeout(function(){
+              loading.hide();
+              result.append(output);
+            }, 400);
+          } else if(businesses.length < 1){
+            output += `<center>Oops, we can't find any location registered on Yelp around ${query}.</center>`;
+            loading.css("opacity", "0");
+            setTimeout(function(){
+              loading.hide();
+              result.append(output);
+            }, 400);
+          } else {
+            businesses.forEach((business, i)=>{
+
+              requests.push($.get(`/nightlife-app/api/getVisitors?businessId=${business.id}`, function(data){
+                business.visitors = data.visitors;
+                var visited = false;
+                if(business.visitors) {
+                  business.visitors_count = Object.keys(business.visitors).length;
+                  console.log(fbUid);
+                  if(data.visitors[fbUid]){
+                    visited = true;
+                  }
+                }
+                else business.visitors_count = 0;
+                
+                
+                output += 
+                `
+                  <div class="business-entry">
+                    <h3><a href="${business.url}">${business.name}</a></h3>
+                    <div class="row">
+                      <div class="col-xs-4 col-sm-3">
+                        <img src="${business.image_url}"/>
+                      </div>
+                      <div class="col-sm-3 hidden-xs">
+                        <p><i class="fa fa-map-marker"></i> ${business.location.display_address}</p>
+                        <p><i class="fa fa-phone"></i> ${business.display_phone}</p>
+                        <p><i class="fa fa-users"></i> <span id="${business.id}-visitors-count">${business.visitors_count}</span> people going here</p>
+                      </div>
+                      <div class="col-sm-3 hidden-xs">
+                        <p><i class="fa fa-star"></i> ${business.rating} out of 5</p>
+                        <p><i class="fa fa-comments"></i> ${business.review_count} reviews</p>
+                      </div>
+                      <div class="col-sm-3 hidden-xs">
+                        <button ${visited ? 'style="display: none"' : ''} id="${business.id}-going-btn" onclick="going('${business.id}', this)" class="btn btn-xs btn-primary"><i class="fa fa-car"></i> I'm going here</button>
+                        <button ${visited ? '' : 'style="display: none"'} id="${business.id}-not-going-btn" onclick="notGoing('${business.id}', this)" class="btn btn-xs btn-danger"><i class="fa fa-times"></i> I'm not going here anymore</button>
+                      </div>
+                      <div class="col-xs-8 visible-xs">
+                        <p><i class="fa fa-map-marker"></i> ${business.location.display_address}</p>
+                        <p><i class="fa fa-phone"></i> ${business.display_phone}</p>
+                        <p><i class="fa fa-star"></i> ${business.rating} out of 5</p>
+                        <p><i class="fa fa-comments"></i> ${business.review_count} reviews</p>
+                        <p><i class="fa fa-users"></i> <span id="${business.id}-visitors-count-xs">${business.visitors_count}</span> people going here</p>
+                        <button ${visited ? 'style="display: none"' : ''} id="${business.id}-going-btn-xs" onclick="going('${business.id}', this)" class="btn btn-xs btn-primary"><i class="fa fa-car"></i> I'm going here</button>
+                        <button ${visited ? '' : 'style="display: none"'} id="${business.id}-not-going-btn-xs" onclick="notGoing('${business.id}', this)" class="btn btn-xs btn-danger"><i class="fa fa-times"></i> I'm not going here anymore</button>
+                      </div>
+                    </div>
+                    
+                  </div>
+                `;
+              }));
+            });
+            $.when.apply($, requests).done(function(schemas) {
+              // console.log("All requests complete");
+              // do something...
+              loading.css("opacity", "0");
+              setTimeout(function(){
+                loading.hide();
+                result.append(output);
+              }, 400);
+              requests = [];
+            });
+          }
+        });
+        
+      }
+      
+      function getUserFBName(){
+        FB.getLoginStatus(function(response) {
+          if (response.status === 'connected') {
+            // the user is logged in and has authenticated your
+            // app, and response.authResponse supplies
+            // the user's ID, a valid access token, a signed
+            // request, and the time the access token 
+            // and signed request each expire
+            var uid = response.authResponse.userID;
+            var accessToken = response.authResponse.accessToken;
+            fbUid = uid;
+            $.get(`/nightlife-app/api/getName?id=${uid}`, function(data){
+                var name = data.fb_name;
+                searchButton.disabled = false;
+                username.html(`<a target="_blank" href="https://facebook.com/${response.authResponse.userID}">${name}</a>`);
+            });
+          } else {
+            searchButton.disabled = false;
+          }
+        })
+      }
+
+      function going(businessId, element){
+        FB.getLoginStatus(function(response) {
+          if (response.status === 'connected') {
+            // the user is logged in and has authenticated your
+            // app, and response.authResponse supplies
+            // the user's ID, a valid access token, a signed
+            // request, and the time the access token 
+            // and signed request each expire
+            var uid = response.authResponse.userID;
+            var accessToken = response.authResponse.accessToken;
+            $(`#${businessId}-going-btn`).hide();
+            $(`#${businessId}-going-btn-xs`).hide();
+            $.get(`/nightlife-app/api/addDestination?id=${uid}&locationId=${businessId}`, function(data){
+              console.log("Data collected!");
+              $(`#${businessId}-visitors-count`).html( Number($(`#${businessId}-visitors-count`).html() ) + 1);
+              $(`#${businessId}-not-going-btn`).show();
+              $(`#${businessId}-visitors-count-xs`).html( Number($(`#${businessId}-visitors-count-xs`).html() ) + 1);
+              $(`#${businessId}-not-going-btn-xs`).show();
+            });
+            console.log("Going to " + businessId);
+          } else if (response.status === 'not_authorized') {
+            // the user is logged in to Facebook, 
+            // but has not authenticated your app
+            console.log("not logged in yet");
+            facebookLogin();
+          } else {
+            // the user isn't logged in to Facebook.
+            console.log("not logged in yet");
+            facebookLogin();
+          }
+        });
+      }
+      function notGoing(businessId, element){
+        FB.getLoginStatus(function(response) {
+          if (response.status === 'connected') {
+            // the user is logged in and has authenticated your
+            // app, and response.authResponse supplies
+            // the user's ID, a valid access token, a signed
+            // request, and the time the access token 
+            // and signed request each expire
+            var uid = response.authResponse.userID;
+            var accessToken = response.authResponse.accessToken;
+            $(`#${businessId}-not-going-btn`).hide();
+            $(`#${businessId}-not-going-btn-xs`).hide();
+            $.get(`/nightlife-app/api/removeDestination?id=${uid}&locationId=${businessId}`, function(data){
+              console.log("Data collected!");
+              $(`#${businessId}-visitors-count`).html( Number($(`#${businessId}-visitors-count`).html() ) - 1);
+              $(`#${businessId}-going-btn`).show();
+              $(`#${businessId}-visitors-count-xs`).html( Number($(`#${businessId}-visitors-count-xs`).html() ) - 1);
+              $(`#${businessId}-going-btn-xs`).show();
+            });
+            console.log("Not going to " + businessId);
+          } else if (response.status === 'not_authorized') {
+            // the user is logged in to Facebook, 
+            // but has not authenticated your app
+            console.log("not logged in yet");
+            facebookLogin();
+          } else {
+            // the user isn't logged in to Facebook.
+            console.log("not logged in yet");
+            facebookLogin();
+          }
+        });
+      }
+      function facebookLogin(){
+        FB.login(function(response) {
+          if (response.authResponse) {
+            console.log('Welcome!  Fetching your information.... ');
+            FB.api('/me', function(response) {
+              // response = {id: id, name: name};
+              username.html(`<a target="_blank" href="https://facebook.com/${response.id}">${response.name}</a>`);
+
+              $.get(`/nightlife-app/api/registerFacebookUser?id=${response.id}&name=${response.name}`, function(data){
+                console.log("user FB name and Id added to database");
+              });
+
+            });
+          } else {
+            console.log('User cancelled login or did not fully authorize.');
+          }
+        });
+      }
+      
+
+    //FB SDK load
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '1884494681816696',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v2.8'
+      });
+      FB.AppEvents.logPageView();  
+      fbSDKLoaded = true; 
+      getUserFBName();
+    };
+
+    (function(d, s, id){
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+  </script>
+
+</html>

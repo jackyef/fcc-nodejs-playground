@@ -3,10 +3,19 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 const passwordHash = require('password-hash');
 const session = require('express-session');
-const app = express();
 const moment = require('moment');
+const passport = require('passport');
+const FacebookStrategy = require('passport-facebook');
+
+const app = express();
 const port = process.env.PORT || "8000";
 const mongoUrl = process.env.PROD_MONGODB || "mongodb://jackyef3:jackyef123@ds145669.mlab.com:45669/voting_app_db";
+
+// If you are seeing this and thought to yourself "Hey, free key!",
+// well, you're out of luck. This key only limits to 3 USD/month 
+// and it won't go over the limit at all 
+var bingApiKey = process.env.BING_API_KEY || "93f9b3ff8af84047998e53be764e5904";
+
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
@@ -110,11 +119,7 @@ app.get('/api/shortened-url/:hash', function (req, res){
   res.send("URL is not in database");
 });
 
-// If you are seeing this and thought to yourself "Hey, free key!",
-// well, you're out of luck. This key only limits to 3 USD/month 
-// and it won't go over the limit at all 
 
-var bingApiKey = "93f9b3ff8af84047998e53be764e5904";
 const request = require('request');
 const fs = require('fs');
 var imgSearchDB = [];
@@ -323,6 +328,12 @@ app.post('/voting-app/poll/:id', function (req, res){
 
 app.get('/voting-app/poll/delete/:id', function (req, res){
   // res.sendFile("voting-app/index.html");
+
+  // I know I didn't perform any check to check if
+  // the session.username == poll.username
+  // freeCodeCamp user story doesn't include this,
+  // so I didn't bother to do it as this is only 
+  // an exercise, not a production ready app
   if(!ObjectID.isValid(req.params.id)) {
     res.redirect("/voting-app");
     return;
@@ -470,32 +481,6 @@ app.get('/voting-app/initDB', function (req, res){
       return;
     }
     var pollsCollection = db.collection("polls");
-    // var pollsCursor = pollsCollection.find();
-    // var poll = {
-    //   id: 1,
-    //   title: "Who do you pick, X or Y?",
-    //   votes: 5,
-    //   options: [
-    //     {
-    //       content: "X",
-    //       votes: 3,
-    //     },
-    //     {
-    //       content: "Y",
-    //       votes: 2,
-    //     }
-    //   ],
-    //   votedBy: {
-    //     1: 1,
-    //     2: 1,
-    //     3: 1,
-    //     4: 2,
-    //     5: 2
-    //   }
-    // };
-
-    // pollsCollection.insert(poll);
-    // var polls = pollsCollection.find().toArray();
     db.createCollection("users", function(err, collection) {});
     db.collection("users").createIndex( { "username": 1 }, { unique: true } );
 
@@ -507,3 +492,200 @@ app.get('/voting-app/initDB', function (req, res){
 });
 
 // End of voting app
+
+// Start of nightlife coordination app
+var yelpApiId = process.env.YELP_API_ID;
+var yelpApiSecret = process.env.YELP_API_SECRET;
+var cachedToken;
+
+var fbAppId = process.env.FB_APP_ID;
+var fbAppSecret = process.env.FB_APP_SECRET;
+
+
+app.get('/nightlife-app', function (req, res){
+  var data = {};
+  data.title = 'fcc-nightlife-app';
+  data.req = req;
+  
+  res.render("nightlife/index", data);
+});
+
+app.get('/nightlife-app/api/search', function(req, res){
+  var result;
+  var authEndPoint = "https://api.yelp.com/oauth2/token";
+  var location = req.query.location;
+  var term = req.query.term;
+
+  var options = {
+    method: "POST",
+    url: authEndPoint,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    // json: true,
+    form: {
+      grant_type: "client_credentials",
+      client_id: yelpApiId,
+      client_secret: yelpApiSecret
+    }
+  };
+  // console.log(cachedToken);
+  if(!cachedToken){
+    request.post(options, function(error, response, body){
+      cachedToken = JSON.parse(body).access_token;
+      yelpSearch(location, term);
+    });
+  } else {
+      yelpSearch(location, term);
+  }
+  
+  function yelpSearch(location, term){
+    var endpoint = "https://api.yelp.com/v3/businesses/search";
+    var url = endpoint + "?location="+ encodeURI(location)+ "&term=" + encodeURI(term) + "&limit=" + 10;
+    var opt = {
+        url: url,
+        headers: {
+          'Accept': 'application/json',
+        },
+        auth: {
+          'bearer': cachedToken
+        }
+      };
+    request(opt, function (error, response, body) {
+      var received = JSON.parse(body);
+      
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(received, null, 2));
+    });
+  }
+});
+
+app.get("/nightlife-app/api/registerFacebookUser", function(req, res){
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var user = {fb_id: req.query.id, fb_name: req.query.name};
+    var users = db.collection("nightlife_users");
+    users.createIndex( { "fb_id": 1 }, { unique: true } );
+    users.insertOne(user).then(function(){
+      // res.setHeader("Content-Type", "application/json");
+      res.send("User added to DB!");
+    });
+  });
+});
+
+app.get("/nightlife-app/api/addDestination", function(req, res){
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var fbId = req.query.id;
+    var locationId = req.query.locationId;
+    var update = {};
+    update.visitors = {};
+    update.visitors[fbId] = true; // true means this user is going
+    db.collection("nightlife_locations").update({"id": locationId}, {
+        $set: update
+      },
+      {upsert: true} 
+    ).then(function(){
+      res.send("Data added to DB!");
+      return;
+    });
+    // res.send(JSON.stringify(polls, null, 2));
+  });
+});
+
+app.get("/nightlife-app/api/removeDestination", function(req, res){
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var fbId = req.query.id;
+    var locationId = req.query.locationId;
+    var update = {};
+    update["visitors."+fbId] = "";
+    db.collection("nightlife_locations").update({"id": locationId}, {
+        $unset: update
+      },
+      {upsert: true} 
+    ).then(function(){
+      res.send("Data removed from DB!");
+      return;
+    });
+    // res.send(JSON.stringify(polls, null, 2));
+  });
+});
+
+app.get("/nightlife-app/api/getName", function(req, res){
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var fbId = req.query.id;
+
+    res.setHeader("Content-Type", "application/json");
+    db.collection("nightlife_users").findOne({"fb_id": fbId}).then(function(user){
+      if(!user) {
+        var result = {error: "Error getting user data"};
+        res.send(JSON.stringify(result, null, 2));
+        return;
+      }
+      var result = user;
+      res.send(JSON.stringify(result, null, 2));
+    });
+
+  });
+});
+
+
+app.get("/nightlife-app/api/getVisitors", function(req, res){
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var businessId = req.query.businessId;
+
+    res.setHeader("Content-Type", "application/json");
+    db.collection("nightlife_locations").findOne({"id": businessId}).then(function(location){
+      if(!location) {
+        var result = {error: "Error getting location data"};
+        res.send(JSON.stringify(result, null, 2));
+        return;
+      }
+      var result = location;
+      res.send(JSON.stringify(result, null, 2));
+    });
+
+  });
+});
+
+// passport.use(new FacebookStrategy({
+//   clientID: fbAppId,
+//   clientSecret: fbAppSecret,
+//   callbackURL: "http://localhost:8000/auth/facebook/callback"
+// },
+//   function(accessToken, refreshToken, profile, cb){
+//     User.findOrCreate({facebookId: profile.id}, function(err, user){
+//       return cb(err, user);
+//     });
+//   }
+// ))
+
+// app.get('/auth/facebook',
+//   passport.authenticate('facebook'));
+
+// app.get('/auth/facebook/callback',
+//   passport.authenticate('facebook', { failureRedirect: '/nightlife-app' }),
+//   function(req, res) {
+//     // Successful authentication, redirect home.
+//     res.redirect('/nightlife-app');
+//   });
+
+// end of nightlife coordination app
