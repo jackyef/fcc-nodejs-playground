@@ -588,7 +588,6 @@ app.get("/nightlife-app/api/addDestination", function(req, res){
     var fbId = req.query.id;
     var locationId = req.query.locationId;
     var update = {};
-    update.visitors = {};
     update["visitors."+fbId] = true; // true means this user is going
     db.collection("nightlife_locations").update({"id": locationId}, {
         $set: update
