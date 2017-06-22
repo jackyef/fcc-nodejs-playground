@@ -288,7 +288,7 @@
                     `;
         $("#symbols").append(output);
       }
-      var wsUri = "ws://"+req.hostname+"/stock-app/ws";
+      var wsUri = "ws://<%= req.hostname %>/stock-app/ws";
       var websocket;
 
       function initWS(){
