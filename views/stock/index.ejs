@@ -1,0 +1,320 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title><%= title %></title>
+        <link href="/css/metro-bootstrap.css" rel="stylesheet" /> 
+        <!--<link href="/css/bootstrap.css" rel="stylesheet" /> -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" /> 
+
+        <script src="https://code.highcharts.com/stock/highstock.js"></script>
+        <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <style>
+    .business-entry img{
+      border-radius: 50%;
+      height: 8em;
+      width: 8em;
+    }
+    @media (max-width: 600px){
+      .business-entry img{
+        height: 6em;
+        width: 6em;
+      }
+    }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">fcc-stock-app</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <!--<li class=""><a href="#">Home</a></li>-->
+      </ul>
+    </div>
+  </div>
+</nav>
+  
+<div class="container">    
+  <div class="row">
+    <div class="col-sm-12">
+      <center>
+        <div class="well">
+          <h1>
+            <div id="loading">loading...</div>
+          </h1>
+          <div id="chart">
+
+          </div>
+        </div>
+      </center>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2">
+      <div id="add-symbol-form" class="col-xs-4">
+        <h1>Add stock</h1>
+        <br/>
+        <form id="add-form" class="form-group" action="javascript:void(0)">
+          <div class="input-group">
+            <input class="form-control" type="text" id="symbol-input" placeholder="symbol (AAPL, MSFT, etc.)" required/>
+            <span class="input-group-btn">
+              <button class="btn btn-success" id="add-button" disabled>add</button>
+            </span>
+          </div>
+        </form>
+        <span id="error-span" style="font-weight: 700"></span>
+        <br/>
+        The tracked stock symbols are updated in realtime. If there are others who are viewing this page and they add/remove a symbol,
+        the changes will be displayed here too! Implemented using websocket.
+        <br/>
+        <br/>
+        (If you don't know what stock symbols are, you can browse <a href="http://www.nasdaq.com/screening/companies-by-name.aspx?letter=C">here</a>)
+      </div>
+      <div id="symbols" class="col-xs-8">
+
+      </div>
+    </div>
+    <br/>
+  </div>
+</div>
+
+<!-- include footer -->
+
+</body>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/js/bootstrap.js"></script>
+    <script>
+      var seriesOptions = [],
+          seriesCounter = 0,
+          names = <%- JSON.stringify(names) %>;
+      var colors = [];
+      colors.push("#2d89ef");
+      colors.push("#603cba");
+      colors.push("#9f00a7");
+      colors.push("#99b433");
+      colors.push("#2b5797");
+      colors.push("#ff0097");
+      colors.push("#7e3878");
+      colors.push("#00aba9");
+      colors.push("#1e7145");
+      colors.push("#ffc40d");
+      colors.push("#da532c");
+      colors.push("#ee1111");
+      colors.push("#00a300");
+      colors.push("#b91d47");
+      var colorCounter = 0;
+
+      var chart;
+
+      $("#add-form").submit(function(event){
+        event.preventDefault();
+        var value = $("#symbol-input").val();
+        websocket.send("ADD:"+value);
+        addSeries(value);
+      });
+      /**
+       * Create the chart when all data is loaded
+       * @returns {undefined}
+       */
+      function createChart() {
+          return Highcharts.stockChart('chart', {
+              rangeSelector: {
+                  selected: 4
+              },
+              yAxis: {
+                  labels: {
+                      formatter: function () {
+                          return (this.value > 0 ? ' + ' : '') + this.value + '%';
+                      }
+                  },
+                  plotLines: [{
+                      value: 0,
+                      width: 2,
+                      color: 'silver'
+                  }]
+              },
+              plotOptions: {
+                  series: {
+                      compare: 'percent',
+                      showInNavigator: true
+                  }
+              },
+              tooltip: {
+                  pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+                  valueDecimals: 2,
+                  split: true
+              },
+              series: seriesOptions
+          });
+      }
+
+      var alphaVantageApiKey = "EXRTXZ5R1SG6BO4H"; //this key is totally free, I didn't bother putting it into .env
+      var alphaVantageEndpoint = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&apikey=${alphaVantageApiKey}&outputsize=compact`;
+      
+      $.each(names, function (i, name) {
+          // $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=' + name.toLowerCase() + '-c.json&callback=?',    function (data) {
+              // console.log(data);
+          $.getJSON(alphaVantageEndpoint+'&symbol=' + name.toUpperCase(), function (data){
+              var arrayData = []; 
+              var result = data["Time Series (Daily)"];
+              for(var date in result){
+                var timestamp = new Date(date).getTime();
+                var value = Number(result[date]["1. open"]);
+                arrayData.push([timestamp, value]);
+              }
+              var arrayReversed = arrayData.reverse();
+              console.log(arrayData);
+              seriesOptions[i] = {
+                  name: name,
+                  data: arrayReversed,
+                  color: colors[i]
+              };
+              colorCounter = (colorCounter + 1) % colors.length;
+              // As we're loading the data asynchronously, we don't know what order it will arrive. So
+              // we keep a counter and create the chart when all the data is loaded.
+              seriesCounter += 1;
+              if (seriesCounter === names.length) {
+                  chart = createChart();
+                  names.forEach((symbol, index)=>{
+                    addTile(symbol, index);
+                  });
+                  $("#add-button").removeProp("disabled");
+                  $("#loading").fadeOut();
+                  initWS();
+              }
+          });
+      });
+
+      function removeSeries(symbol){
+        if(chart){
+          if(chart.series.length && names.indexOf(symbol) !== -1){
+            var index = names.indexOf(symbol);
+            chart.series[index].remove();
+            $(`#symbol-${symbol}`).remove();
+            names.splice(index, 1);
+            seriesCounter--;
+          }
+        }
+      }
+      function removeSeriesAndSend(symbol){
+        websocket.send("REMOVE:"+symbol);
+        removeSeries(symbol);
+      }
+      function addSeries(symbol){
+        console.log("adding" + symbol);
+        if(names.length >= colors.length){
+          // we're out of color!
+          // let's just say to the user that they can't any more symbol
+          console.log("maxed already!");
+          $("#error-span").html("Maximum size reached! Please remove some series before adding a new one.");
+          $("#error-span").css("color", "#b91d47");
+          return;
+        } else if(names.indexOf(symbol) !== -1){
+          // already exist!
+          // don't let the user add dupes
+          console.log("can't add the same company twice!");
+          $("#error-span").html("That data is already in the chart!");
+          $("#error-span").css("color", "#b91d47");
+          return;
+        }
+        $("#add-button").prop("disabled", "true");
+        $("#error-span").html(`Trying to fetch data for '${symbol}'.`);
+        $("#error-span").css("color", "#ffc40d");
+        $.getJSON(alphaVantageEndpoint+'&symbol=' + symbol.toUpperCase(), function (data){
+          console.log(data);
+          if(data["Error Message"]){
+            // invalid symbol
+            // do some stuffs
+            console.log("error fetching data! Symbol not recognized!");
+            $("#error-span").html("An error occured! That symbol might not belong to any company?");
+            $("#error-span").css("color", "#b91d47");
+            $("#add-button").removeProp("disabled");
+          } else {
+            // add the symbol data to the series
+            var index = names.length;
+            names.push(symbol);
+
+            var arrayData = []; 
+            var result = data["Time Series (Daily)"];
+            for(var date in result){
+              var timestamp = new Date(date).getTime();
+              var value = Number(result[date]["1. open"]);
+              arrayData.push([timestamp, value]);
+            }
+            var arrayReversed = arrayData.reverse();
+            console.log(arrayData);
+            seriesOptions.push({
+                name: symbol,
+                data: arrayReversed,
+                color: colors[colorCounter]
+            });
+            seriesCounter += 1;
+            chart.addSeries(seriesOptions[seriesOptions.length-1]);
+            addTile(symbol, colorCounter);
+            colorCounter = (colorCounter + 1) % colors.length;
+
+            console.log(`data for '${symbol}' added`);
+            $("#add-button").removeProp("disabled");
+            $("#error-span").html(`Data for '${symbol}' is added`);
+            $("#error-span").css("color", "#00a300");
+            
+          }
+              
+        });
+      }
+      function addTile(symbol, colorIndex){
+        var output = `
+                    <div class="symbol" id="symbol-${symbol}">
+                      <div class="thumbnail tile tile-medium" style="background-color: ${colors[colorIndex]}">
+                        <h1>${symbol}</h1>
+                        <br/>
+                        <a href="javascript:void(0)" id="${symbol}" onclick="removeSeriesAndSend(this.id)">
+                          <h3><i class="fa fa-times"></i></h3>
+                        </a>  
+                        </div>
+                    </div>
+                    `;
+        $("#symbols").append(output);
+      }
+      var wsUri = "ws://"+req.hostname+"/stock-app/ws";
+      var websocket;
+
+      function initWS(){
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function(evt) { 
+          console.log("Connected to WebSocket:", wsUri);
+        };
+        websocket.onmessage = function(evt) { 
+          // the message will be in this format <ACTION>:<SYMBOL>
+          // i. e.: ADD:MSFT
+          //        REMOVE:MSFT
+          console.log("Received command from server:", evt.data);
+          var message = evt.data.split(':');
+          var action = message[0];
+          var symbol = message[1];
+          if(action == "ADD"){
+            addSeries(symbol);
+          } else if (action == "REMOVE"){
+            removeSeries(symbol, true);
+          }
+
+        };
+      }
+      // websocket.onclose = function(evt) { onClose(evt) };
+      // websocket.onerror = function(evt) { onError(evt) };
+
+    </script>    
+
+</html>

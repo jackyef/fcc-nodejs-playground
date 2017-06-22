@@ -7,14 +7,15 @@ const moment = require('moment');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook');
 
-const app = express();
+var app = express();
+var expressWs = require('express-ws')(app);
 const port = process.env.PORT || "8000";
-const mongoUrl = process.env.PROD_MONGODB || "mongodb://jackyef3:jackyef123@ds145669.mlab.com:45669/voting_app_db";
+const mongoUrl = process.env.PROD_MONGODB;
 
 // If you are seeing this and thought to yourself "Hey, free key!",
 // well, you're out of luck. This key only limits to 3 USD/month 
 // and it won't go over the limit at all 
-var bingApiKey = process.env.BING_API_KEY || "93f9b3ff8af84047998e53be764e5904";
+var bingApiKey = process.env.BING_API_KEY;
 
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
@@ -691,3 +692,39 @@ app.get("/nightlife-app/api/getVisitors", function(req, res){
 //   });
 
 // end of nightlife coordination app
+
+// start of realtime stock app
+
+var alphaVantageApiKey = "EXRTXZ5R1SG6BO4H"; //this key is totally free, I didn't bother putting it into .env
+var alphaVantageEndpoint = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&apikey=${alphaVantageApiKey}`;
+
+var names = ['MSFT', 'AAPL', 'GOOG', 'FB'];
+
+app.get('/stock-app', function (req, res){
+  var data = {};
+  data.title = 'fcc-stock-app';
+  data.req = req;
+  data.names = names;
+  res.render("stock/index", data);
+});
+
+app.ws('/stock-app/ws', function(ws, req) {
+  ws.on('message', function(msg) {
+    console.log("broadcasting message to all clients:", msg);
+    expressWs.getWss().clients.forEach(function(client,i){
+      if(client !== ws) client.send(msg);
+    });
+    var data = msg.split(':');
+    var action = data[0];
+    var symbol = data[1];
+    
+    if(action == "ADD"){
+      names.push(symbol);
+    } else if(action == "REMOVE") {
+      names.splice(names.indexOf(symbol), 1);
+    }
+
+  });
+});
+
+// end of realtime stock app
