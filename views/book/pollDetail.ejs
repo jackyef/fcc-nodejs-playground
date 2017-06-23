@@ -1,0 +1,128 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var poll = (<%- JSON.stringify(poll) %>);
+        var array = [];
+        array.push(["Vote content", "Vote count"]);
+        
+        for(var key in poll.options){
+          array.push([poll.options[key].content, poll.options[key].votes]);
+        }; 
+        var data = google.visualization.arrayToDataTable(array);
+
+        var options = {
+          title: 'Votes'
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+
+        <title><%= title %></title>
+        <link href="/css/bootstrap.css" rel="stylesheet" /> 
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" /> 
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="/voting-app">fcc-voting-app</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class=""><a href="/voting-app">Home</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#"><span class="fa fa-user"></span> <%= session.username %> </a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+  
+<div class="container">    
+  <div class="row">
+    <div class="col-sm-4">
+      <%- include("templates/sidebar") %>
+    </div>
+
+    <div class="col-sm-8">
+        <h3><%= poll.title %></h3>
+
+        <div class="col-sm-12 row well well-sm">
+          <form class="form-inline" method="POST" action="<%= req.url %>">
+            <input type="hidden" name="optionsSize" value="<%= optionsSize %>" />
+            <div class="col-sm-8">
+              <h4>Options:</h4>
+              <div id="options">
+                <% if(!session.votedAlready) { %>
+                  <% for(var key in poll.options){%>
+                <p style="font-size: 1.2em"><label><input class="radio-inline" 
+                   style="vertical-align: baseline" type="radio" name="vote" required
+                   value="<%= key %>"/>
+                   <%= poll.options[key].content %></label>
+                  <br/>
+                  <small>votes: <%= poll.options[key].votes %></small> 
+                </p>
+                  <% } %>
+                <% } else { %>
+                  <% for(var key in poll.options){%>
+                <p style="font-size: 1.2em
+                  <%= key == session.votedOption ? ";font-weight: 700; font-style: italic; color:rgb(24, 188, 156)" : "" %>"><label><%= poll.options[key].content %></label>
+                  <br/>
+                  <small>votes: <%= poll.options[key].votes %></small> 
+                </p>  
+                  <% } %>
+                <% } %>
+                <% if(session.loggedIn && !session.votedAlready) { %>
+                <p style="font-size: 1.2em"><input class="radio-inline" 
+                   style="vertical-align: baseline" type="radio" name="vote" value="<%= optionsSize %>" required/>
+                   <input type="text" class="form-control" placeholder="add my own option" name="customOption" />
+                  <br/>
+                <% } %>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <br/>
+              <br/>
+              <% if(!session.votedAlready) { %>
+              <p><button class="btn btn-success btn-block">Add my vote!</button></p>
+              <% } %>
+              Total votes: <%= poll.votes %>
+            </div>
+          </form>
+          <div class="col-xs-12">
+            <div id="piechart"></div>
+            Share this poll with your friends:
+            <input type="text" class="form-control"readonly value="<%= req.hostname+req.originalUrl %>"/>
+          </div>
+        </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- include footer -->
+<%- include("templates/footer") %>
+
+</body>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/js/bootstrap.js"></script>
+</html>

@@ -43,13 +43,13 @@ app.use(session(
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-app.use(function (req, res, next) {
-  req.query.signupError = null;
-  req.query.loginError = null;
-  req.query.signupSuccess = null;
-  req.query.loginSuccess = null;
-  next();
-})
+// app.use(function (req, res, next) {
+  // req.query.signupError = null;
+  // req.query.loginError = null;
+  // req.query.signupSuccess = null;
+  // req.query.loginSuccess = null;
+//   next();
+// })
 
 
 app.get('/', function(req, res){
@@ -728,3 +728,364 @@ app.ws('/stock-app/ws', function(ws, req) {
 });
 
 // end of realtime stock app
+
+// start of book trading app
+
+app.get('/book-app', function (req, res){
+  var data = {};
+  data.title = 'fcc-book-app';
+
+  // Connect to the db
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var books = db.collection("books");
+    if(!req.session.loggedIn) req.session.username = "Guest";
+    data.req = req;
+    data.session = req.session;
+    // var pollsCursor = pollsCollection.find();
+    books.find( { username: { $not: new RegExp(req.session.username) } }).sort({_id: -1}).toArray().then(function(books){
+      data.books = books;
+      res.render("book/index", data);
+    });
+  });
+});
+
+app.get('/book-app/my-books', function (req, res){
+  var data = {};
+  data.title = 'fcc-book-app';
+
+  // Connect to the db
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var books = db.collection("books");
+    if(!req.session.loggedIn) req.session.username = "Guest";
+    data.req = req;
+    data.session = req.session;
+    // var pollsCursor = pollsCollection.find();
+    books.find( { username: req.session.username }).sort({_id: -1}).toArray().then(function(books){
+      data.books = books;
+      res.render("book/index", data);
+    });
+  });
+});
+
+
+app.post('/book-app/signup', function (req, res){
+  // res.sendFile("book-app/index.html");
+  // Connect to the db
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var users = db.collection("users");
+
+    var user = {
+      username: req.body.username,
+      email: req.body.email,
+      password: passwordHash.generate(req.body.password)
+    };
+
+    users.insert(user).then(function(){
+      res.redirect(req.baseUrl+"/book-app?signupSuccess=1");
+    }).catch(function(err){
+      res.redirect(req.baseUrl+"/book-app?signupError=1");
+    });
+  });
+
+});
+
+app.post('/book-app/login', function (req, res){
+  // res.sendFile("book-app/index.html");
+  // Connect to the db
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var users = db.collection("users");
+    var user = {
+      username: req.body.username
+    };
+
+    users.findOne(user).then(function(data){
+      // console.log(data);
+      if(data !== null) {
+        if(passwordHash.verify(req.body.password, data.password)){
+          req.session.username = data.username;
+          req.session.city = data.city;
+          req.session.state = data.state;
+          req.session.fullname = data.fullname;
+          req.session.loggedIn = true;
+          var backURL=req.header('Referer') || '/';
+          res.redirect(backURL);
+          return;
+        }
+      }
+      res.redirect(req.baseUrl+"/book-app?loginError=1");
+    });
+  });
+});
+
+app.get('/book-app/logout', function (req, res){
+  req.session.destroy(function(err){
+    res.redirect("/book-app");
+  });
+});
+
+app.get('/book-app/edit-info', function (req, res){
+  var data = {};
+  data.title = 'Edit my information';
+
+  if(!req.session.loggedIn) {
+    req.session.username = "Guest";
+    res.redirect("/book-app"); // need to be logged in to get here
+  } 
+
+  data.req = req;
+  data.session = req.session;
+  res.render("book/edit-info", data);
+});
+
+app.post('/book-app/edit-info', function (req, res){
+  var data = {};
+
+  if(!req.session.loggedIn) {
+    req.session.username = "Guest";
+    res.redirect("/book-app"); // need to be logged in to get here
+  }
+
+  var toSet = {};
+  toSet.city = req.body.city;
+  toSet.state = req.body.state;
+  toSet.fullname = req.body.fullname;
+
+  MongoClient.connect(mongoUrl, function(err, db){
+    if(err){
+      console.log(err);
+      return;
+    }
+    var users = db.collection("users");
+    users.update({"username": req.session.username}, {
+      $set: toSet
+    }).then(function(result){
+      db.collection("users").findOne({"username": req.session.username}).then(function(user){
+        if(data !== null) {
+          req.session.city = user.city;
+          req.session.state = user.state;
+          req.session.fullname = user.fullname;
+          req.session.loggedIn = true;
+        }
+      }).then(function(result){
+        data.req = req;
+        data.session = req.session;
+        res.redirect("/book-app/edit-info?success=1");
+      });
+    });
+  });
+  // res.setHeader("Content-Type", "application/json");
+  // res.send(JSON.stringify(req.body, null, 2));
+  // res.render("voting/newPoll", data);
+});
+
+app.get('/book-app/my-books/add', function (req, res){
+  var data = {};
+  data.title = 'Add a new book';
+
+  if(!req.session.loggedIn) {
+    req.session.username = "Guest";
+    res.redirect("/book-app"); // need to be logged in to get here
+  }
+
+  data.req = req;
+  data.session = req.session;
+  res.render("book/add", data);
+});
+
+app.post('/book-app/my-books/add', function (req, res){
+  var data = {};
+
+  if(!req.session.loggedIn) {
+    req.session.username = "Guest";
+    res.redirect("/book-app"); // need to be logged in to get here
+  }
+
+  data.req = req;
+  data.session = req.session;
+
+  var book = {};
+  book.title = req.body.title;
+  book.username = req.session.username;
+
+  MongoClient.connect(mongoUrl, function(err, db){
+    if(err){
+      console.log(err);
+      return;
+    }
+    var books = db.collection("books");
+    books.insertOne(book).then(function(result){
+      res.redirect("/book-app/my-books");
+    });
+  });
+  // res.setHeader("Content-Type", "application/json");
+  // res.send(JSON.stringify(req.body, null, 2));
+  // res.render("voting/newPoll", data);
+});
+
+app.get('/book-app/book/trade/:id', function (req, res){
+  var data = {};
+
+  if(!req.session.loggedIn) {
+    req.session.username = "Guest";
+    res.redirect("/book-app"); // need to be logged in to get here
+  }
+  var bookId = new ObjectID(req.params.id);
+  data.req = req;
+  data.session = req.session;
+
+  var trade = {};
+  trade.book_id = bookId;
+  trade.requester = req.session.username;
+
+  MongoClient.connect(mongoUrl, function(err, db){
+    if(err){
+      console.log(err);
+      return;
+    }
+    var books = db.collection("books");
+
+    books.findOne({"_id": bookId}).then(function(data){
+    // console.log(data);
+      if(data !== null) {
+        trade.owner = data.username;
+        trade.title = data.title;
+      }
+    }).then(function(result){
+      db.collection("trades").insertOne(trade).then(function(result){
+        res.redirect("/book-app/my-trades");
+      });
+    });
+  });
+});
+
+app.get('/book-app/my-trades', function (req, res){
+  var data = {};
+  data.title = 'fcc-book-app';
+
+  // Connect to the db
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var trades = db.collection("trades");
+    if(!req.session.loggedIn) {
+      req.session.username = "Guest";
+      res.redirect("/book-app");
+    }
+    data.req = req;
+    data.session = req.session;
+    // var pollsCursor = pollsCollection.find();
+    trades.find( { $or :[{owner: req.session.username}] }).sort({book_id: -1}).toArray().then(function(trades){
+      data.inTrades = trades;
+    }).then(function(){
+      trades.find( { $or :[{requester: req.session.username}] }).sort({book_id: -1}).toArray().then(function(trades){
+        data.outTrades = trades;
+        res.render("book/trades", data);
+      });
+    });
+  });
+});
+
+app.get('/book-app/book/delete/:id', function (req, res){
+  var data = {};
+
+  if(!req.session.loggedIn) {
+    req.session.username = "Guest";
+    res.redirect("/book-app"); // need to be logged in to get here
+  }
+  var bookId = new ObjectID(req.params.id);
+  data.req = req;
+  data.session = req.session;
+
+  MongoClient.connect(mongoUrl, function(err, db){
+    if(err){
+      console.log(err);
+      return;
+    }
+    var books = db.collection("books");
+
+    books.remove({"_id": bookId}).then(function(data){
+    // console.log(data);
+      res.redirect("/book-app/my-books");
+    });
+  });
+});
+
+app.get('/book-app/trade/cancel/:id', function (req, res){
+  var data = {};
+
+  if(!req.session.loggedIn) {
+    req.session.username = "Guest";
+    res.redirect("/book-app"); // need to be logged in to get here
+  }
+  var tradeId = new ObjectID(req.params.id);
+  data.req = req;
+  data.session = req.session;
+
+  MongoClient.connect(mongoUrl, function(err, db){
+    if(err){
+      console.log(err);
+      return;
+    }
+    var trades = db.collection("trades");
+
+    trades.remove({"_id": tradeId}).then(function(data){
+    // console.log(data);
+      res.redirect("/book-app/my-trades");
+    });
+  });
+});
+
+app.get('/book-app/trade/accept/:id', function (req, res){
+  var data = {};
+
+  if(!req.session.loggedIn) {
+    req.session.username = "Guest";
+    res.redirect("/book-app"); // need to be logged in to get here
+  }
+  var tradeId = new ObjectID(req.params.id);
+  data.req = req;
+  data.session = req.session;
+
+  MongoClient.connect(mongoUrl, function(err, db){
+    if(err){
+      console.log(err);
+      return;
+    }
+    var trades = db.collection("trades");
+    var books = db.collection("books");
+    trades.findOne({"_id": tradeId}).then(function(data){
+    // console.log(data);
+      var toSet = {};
+      toSet["username"] = data.requester;
+      var bookId = ObjectID(data.book_id);
+      books.update({"_id": bookId}, {
+        $set: toSet
+      }).then(function(){
+        trades.remove({"_id": tradeId}).then(function(data){
+        // console.log(data);
+          res.redirect("/book-app/my-trades");
+        });
+      })
+    });
+  });
+});
+
+// end of book trading app
