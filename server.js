@@ -723,7 +723,6 @@ app.ws('/stock-app/ws', function(ws, req) {
     } else if(action == "REMOVE") {
       names.splice(names.indexOf(symbol), 1);
     }
-
   });
 });
 
@@ -1089,3 +1088,168 @@ app.get('/book-app/trade/accept/:id', function (req, res){
 });
 
 // end of book trading app
+
+// start of pinterest-like app
+var Twitter = require('node-twitter-api');
+var shortid = require('shortid');
+var twitterApiKey = process.env.TWITTER_API_KEY;
+var twitterApiSecret = process.env.TWITTER_API_SECRET;
+var twitterApiUrl = "https://api.twitter.com/oauth";
+
+var twitter = new Twitter({
+  consumerKey: twitterApiKey,
+  consumerSecret: twitterApiSecret,
+  callback: "https://fcc-nodejs-playground-jackyef.herokuapp.com/pinterest-app/auth/twitter"
+  // callback: "http://localhost:8000/pinterest-app/auth/twitter"
+});
+var _requestSecret;
+
+app.get('/pinterest-app', function (req, res){
+  var data = {};
+  data.title = 'fcc-pinterest-app';
+
+  // Connect to the db
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var pins = db.collection("pins");
+   
+      data.req = req;
+      data.session = req.session;
+      // var pollsCursor = pollsCollection.find();
+      pins.find().sort({_id: -1}).toArray().then(function(pins){
+        data.pins = pins;
+        res.render("pinterest/index", data);
+      });
+    
+  });
+});
+
+app.get('/pinterest-app/auth/twitter', function(req, res){
+  var requestToken = req.query.oauth_token || null,
+      verifier = req.query.oauth_verifier || null;
+  twitter.getAccessToken(requestToken, _requestSecret, verifier, function(err, accessToken, accessSecret) {
+    if (err)
+      res.status(500).send(err);
+    else
+      twitter.verifyCredentials(accessToken, accessSecret, function(err, user) {
+        if (err)
+          res.status(500).send(err);
+        else
+          req.session.twitter = {};
+          req.session.twitter.user = user;
+          req.session.loggedIn = true;
+          res.redirect('/pinterest-app');
+      });
+  });
+  
+});
+app.get('/pinterest-app/twitter-login', function (req, res){
+  var data = {};
+  data.title = 'fcc-pinterest-app';
+  
+  twitter.getRequestToken(function(err, requestToken, requestSecret){
+    if(err)
+      res.status(500).send(err);
+    else {
+      _requestSecret = requestSecret;
+       res.redirect("https://api.twitter.com/oauth/authenticate?oauth_token=" + requestToken);
+    }
+  });
+});
+
+app.get('/pinterest-app/my-pins', function (req, res){
+  var data = {};
+  data.title = 'fcc-pinterest-app';
+
+  // Connect to the db
+  MongoClient.connect(mongoUrl, function(err, db) {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    var pins = db.collection("pins");
+    if(!req.session.loggedIn) {
+      res.redirect('/pinterest-app');
+      return;
+    }
+    data.req = req;
+    data.session = req.session;
+    // var pollsCursor = pollsCollection.find();
+    pins.find( { username: req.session.twitter.user.screen_name }).sort({_id: -1}).toArray().then(function(pins){
+      data.pins = pins;
+      res.render("pinterest/index", data);
+    });
+  });
+});
+
+app.get('/pinterest-app/logout', function (req, res){
+  req.session.destroy(function(err){
+    res.redirect("/pinterest-app");
+  });
+});
+
+app.post('/pinterest-app/add', function (req, res){
+  var data = {};
+
+  if(!req.session.loggedIn) {
+    res.redirect("/pinterest-app"); // need to be logged in to get here
+    return;
+  }
+
+  data.req = req;
+  data.session = req.session;
+
+  var pin = {};
+  pin.url = req.body.pinUrl;
+  pin.title = req.body.pinTitle;
+  pin.username = req.session.twitter.user.screen_name;
+
+  MongoClient.connect(mongoUrl, function(err, db){
+    if(err){
+      console.log(err);
+      return;
+    }
+    var pins = db.collection("pins");
+    pins.insertOne(pin).then(function(result){
+      res.redirect("/pinterest-app/my-pins");
+    });
+  });
+  // res.setHeader("Content-Type", "application/json");
+  // res.send(JSON.stringify(req.body, null, 2));
+  // res.render("voting/newPoll", data);
+});
+
+
+app.get('/pinterest-app/pin/delete/:id', function (req, res){
+
+  if(!ObjectID.isValid(req.params.id)) {
+    res.redirect("/pinterest-app");
+    return;
+  }
+  var id = new ObjectID(req.params.id);
+  var data = {};
+  data.title = 'pinterest-app';
+
+  if(!req.session.loggedIn) {
+    res.redirect("/pinterest-app");
+    return;
+  }
+  data.req = req;
+  data.session = req.session;
+
+  MongoClient.connect(mongoUrl, function(err, db){
+    if(err){
+      console.log(err);
+      res.redirect("back");
+      return;
+    }
+    db.collection("pins").remove({"_id": id}).then(function(){
+      res.redirect("/pinterest-app/my-pins");
+    });
+  });
+});
+
+// end of pinterest-like app

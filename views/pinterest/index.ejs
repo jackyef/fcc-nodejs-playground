@@ -1,0 +1,200 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title><%= title %></title>
+        <link href="/css/metro-bootstrap.css" rel="stylesheet" /> 
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" /> 
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/masonry-layout@4.2.0/dist/masonry.pkgd.min.js"></script>
+    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
+    <style>
+      .pin{
+        width: 15.5em;
+        display: inline-block;
+        word-wrap: break-word;
+      }
+      .grid-sizer{
+        width: 15.5em;
+        margin: .25em;
+      }
+      .pin .img-container{
+        /*width: 10em;
+        height: 10em;*/
+      }
+      .pin img{
+        width: 100%;
+      }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">fcc-pinterest-app</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class=""><a href="/pinterest-app">Home</a></li>
+        <% if(session.loggedIn) { %>
+        <li class=""><a href="/pinterest-app/my-pins">My pins</a></li>
+        <% } %>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <% if(session.loggedIn) {%>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false" 
+             href="#" 
+             style="padding-top: .25em; padding-bottom: .25em;">
+            <img class="img-circle" style="width: 3em; height: 3em; margin:0em; padding:0em;" 
+                 src="<%= session.twitter.user.profile_image_url %>" />
+            <span style="vertical-align: baseline;">@<%= session.twitter.user.screen_name %></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="/pinterest-app/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
+          </ul>
+        </li>
+        <% } else { %>
+        <li class="bg-info"><a href="/pinterest-app/twitter-login"><i class="fa fa-twitter"></i> Sign in with Twitter </a></li>
+        <% } %>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container">    
+  <div class="row">
+    <div class="col-sm-12">
+
+        <% if(session.loggedIn) {%>
+        <div class="pull-right">
+          <br/>
+          <a href="#" data-toggle="modal" data-target="#add-pin-modal" class="btn btn-success"><i class="fa fa-plus"></i> add a new pin</a>
+          <!-- Modal -->
+          <div class="modal fade" id="add-pin-modal" role="dialog">
+            <div class="modal-dialog">
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 style="color: steelblue;"><span class="fa fa-thumb-tack"></span> Add a new pin!</h4>
+                </div>
+                <div class="modal-body">
+                  <form role="form" action="/pinterest-app/add" method="POST">
+                    <div id="pin-preview">
+                    </div>
+                    <div class="form-group">
+                      <label for="pin-url"><span class="fa fa-image"></span> Image URL</label>
+                      <input type="text" class="form-control" id="pin-url" name="pinUrl" placeholder="Enter image url" required>
+                      <label for="pin-title"><span class="fa fa-image"></span> Title</label>
+                      <input type="text" class="form-control" id="pin-title" name="pinTitle" placeholder="Give this pin a title" required>
+                      <script>
+                        $('#pin-url').keyup(function(){
+                          var url = $('#pin-url').val();
+                          var regex = /https?:\/\/.*((.jpg)|(.png)|(.gif)|(.bmp)|(.jpeg))/;
+                          if(regex.test(url)){
+                            $('#pin-preview').html(`<img style="width:100%;" src="${url}">`);
+                          } else {
+                            $('#pin-preview').html("The URL doesn't seem to contain image");
+                          }
+                        });
+                      </script>
+                    </div>
+                    <button type="submit" class="btn btn-default btn-success btn-block"><span class="fa fa-thumb-tack"></span> Pin it!</button>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-default btn-default pull-left" data-dismiss="modal"><span class="fa fa-times"></span> Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div> 
+        </div>
+        <% } %>
+        <h2>Existing pins</h2>
+        <div class="clearfix"></div>
+        <hr/>
+
+        <div class="pins grid" >
+        <div class="grid-sizer"></div>
+        <% pins.forEach(function(pin,i){ %>
+          <div class="well well-sm pin grid-item">
+            <div class="img-container">
+              <a target="_blank" href="<%= pin.url %>">
+                <img src="<%= pin.url %>" onerror="this.src='/img/placeholder-image.png';"/>
+              </a>
+              <h4><i class="fa fa-thumb-tack"></i> <%= pin.title %></h4>
+              <small>by <a target="_blank" href="https://twitter.com/<%= pin.username %>"><%= pin.username %></a></small>
+            </div>
+            <% if (session.loggedIn) { %>
+            <% if (pin.username == session.twitter.user.screen_name) { %>
+            <div class="pull-right">
+              <a href="/pinterest-app/pin/delete/<%= pin._id %>"class="btn btn-xs btn-danger"><i class="fa fa-times"></i> delete my pin</a>
+            </div>
+            <div class="clearfix"></div>
+            <% } %>
+            <% } %>
+          </div>
+        <% }) %>
+        </div>
+        
+        
+
+    </div>
+  </div>
+</div>
+
+<!-- include footer -->
+<%- include("templates/footer") %>
+
+</body>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/js/bootstrap.js"></script>
+    <script>
+      // layout Masonry after each image loads
+      $grid = $('.grid');
+      // $grid.imagesLoaded(function(){
+      //   $grid = $('.grid').masonry({
+      //       // options
+      //       itemSelector: '.grid-item',
+      //       columnWidth: '.grid-sizer',
+      //       horizontalOrder: true
+      //     });;
+      // });
+      
+      $grid = $('.grid').masonry({
+          // options
+          itemSelector: '.grid-item',
+          columnWidth: '.grid-sizer',
+          horizontalOrder: true
+        });;
+
+      function refreshLayout(){
+        $grid.masonry('layout');
+      }
+
+      $grid.imagesLoaded().progress( function() {
+        refreshLayout();
+      });
+
+      $grid.imagesLoaded().done( function() {
+        refreshLayout();
+      });
+      
+      window.onload = function(){
+        refreshLayout();
+      }
+    </script>
+</html>
