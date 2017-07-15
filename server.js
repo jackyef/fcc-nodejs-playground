@@ -12,7 +12,7 @@ var expressWs = require('express-ws')(app);
 const port = process.env.PORT || "8000";
 const mongoUrl = process.env.PROD_MONGODB ;
 
-var twitterApiKey = process.env.TWITTER_API_KEY ;
+var twitterApiKey = process.env.TWITTER_API_KEY;
 var twitterApiSecret = process.env.TWITTER_API_SECRET ;
 // If you are seeing this and thought to yourself "Hey, free key!",
 // well, you're out of luck. This key only limits to 3 USD/month 
@@ -1255,8 +1255,99 @@ app.get('/pinterest-app/pin/delete/:id', function (req, res){
 // end of pinterest-like app
 
 // start of chat-app
+
+
+var dummyMessages1 = 
+  [
+    {
+      id: 1,
+      author: "jackyef",
+      content: "hey man you up?",
+      timestamp: Date.now()
+    },
+    {
+      id: 2,
+      author: "jackyef",
+      content: "HELLO?",
+      timestamp: Date.now()+1
+    },
+  ];
+var dummyMessages2 = 
+  [
+    {
+      id: 3,
+      author: "jackyef2",
+      content: "Hey I'm chatting you from my other account to check if you have blocked me",
+      timestamp: Date.now()
+    },
+    {
+      id: 4,
+      author: "jackyef2",
+      content: "Still no answer?",
+      timestamp: Date.now()+2
+    },
+  ];
+
+var dummyMessages3 = 
+  [
+    {
+      id: 5,
+      author: "jackyef3",
+      content: "Good thing that I have 3 accounts!",
+      timestamp: Date.now()
+    },
+    {
+      id: 6,
+      author: "jackyef3",
+      content: "What... instant read?",
+      timestamp: Date.now()+3
+    },
+    {
+      id: 7,
+      author: "jackyef3",
+      content: "So you did block me! FRIENDSHIP OVER!",
+      timestamp: Date.now()+5
+    },
+  ];
+
+var allMessages = {
+  1: dummyMessages1,
+  2: dummyMessages2,
+  3: dummyMessages3,
+};
+var entries = {
+  1: {
+    name: "jackyef",
+    id: 1,
+  },
+  2: {
+    name: "jackyef2",
+    id: 2,
+  },
+  3: {
+    name: "jackyef3",
+    id: 3,
+  }
+};
+
 app.get('/chat-app', function(req, res){
   var data = {};
   res.render('chat/index', data);
+});
+
+app.get('/chat-app/initialData', function(req, res){
+  var data = {};
+  data.allMessages = allMessages;
+  data.entries = entries;
+  res.status(200);
+  res.json(data);
+});
+
+app.post('/chat-app/sendMessage', function(req, res){
+  var entryId = req.body.entryId;
+  var msg = req.body.message;
+  allMessages[entryId].push(msg);
+  res.status(200);
+  res.send();
 });
 // end of chat-app
