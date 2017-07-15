@@ -1,0 +1,314 @@
+<head>
+  <title>vue chat-app</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.js"></script>
+  <script src="js/vue.js"></script>
+
+  <style>
+    .chat-entry{
+      padding: .5em;
+      border-bottom: 1px solid gray;
+    }
+    .chat-entry:hover{
+      filter: brightness(120%);
+    }
+    .sidebar, .content{
+      margin: 0 !important;
+      padding: 0 1em 1em 1em !important;
+    }
+    .sidebar, .content{
+      min-height: 100%;
+      height: 100%;
+      overflow-y: scroll;
+    }
+    .content {
+      background-color: #f5f5f5;
+    }
+    .chat-window{
+      bottom: 4.5em;
+      position: absolute;
+      overflow-y: scroll;
+    }
+    .text-box {
+      bottom: 0;
+      height: 4em;
+      position: absolute;
+      padding-right: 1em;
+    }
+    ::-webkit-scrollbar { 
+      display: none; 
+    }
+  </style>
+</head>
+<script>
+
+Vue.component("app-chat-entry", {
+  props: ['entry'],
+  template: `<div class="chat-entry bg-primary">
+                {{entry.name}}
+            </div>`
+});
+
+Vue.component("app-chat-bubble", {
+  props: ['message'],
+  template: `<div class="chat-bubble">
+                {{message.author}}: {{message.content}}<br/>
+                {{message.timestamp}}
+            </div>`
+})
+
+</script>
+
+<body>
+  <div class="container-fluid">
+    <div id="app" class="row">
+      <div class="col-sm-3 hidden-xs sidebar bg-primary">
+        <!-- sidebar -->
+        <h2>VueChat</h2>
+        <hr/>
+        <app-chat-entry 
+          v-for="entry in entries" 
+          :entry="entry"
+          :key="entry.id"
+          @click.native="setEntryId(entry.id)">
+        </app-chat-entry>
+      </div>
+      <div class="col-sm-9 col-xs-12 content">
+        <!-- chat window -->
+        <h2 v-if="currentEntryId">{{ currentChatName }} </h2>
+        <hr/>
+        <div class="chat-window">
+          <app-chat-bubble 
+            v-for="message in messages"
+            :message="message"
+            :key="message.id">
+          </app-chat-bubble>
+        </div>
+
+        <div class="text-box">
+          <form class="form-group"
+            action="#"
+            method="POST" 
+            @submit.prevent="sendMessage">
+            <div class="input-group">
+              <input type="text" class="form-control" v-model="textBox">
+
+              <span class="input-group-btn">
+                <button :disabled="isTextBoxEmpty" class="btn btn-success">
+                  send</button>
+              </span>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+
+<script>
+
+var dummyMessages1 = 
+  [
+    {
+      id: 1,
+      author: "jackyef",
+      content: "hey man you up?",
+      timestamp: Date.now()
+    },
+    {
+      id: 2,
+      author: "jackyef",
+      content: "HELLO?",
+      timestamp: Date.now()+1
+    },
+  ];
+var dummyMessages2 = 
+  [
+    {
+      id: 3,
+      author: "jackyef2",
+      content: "Hey I'm chatting you from my other account to check if you have blocked me",
+      timestamp: Date.now()
+    },
+    {
+      id: 4,
+      author: "jackyef2",
+      content: "Still no answer?",
+      timestamp: Date.now()+2
+    },
+  ];
+
+var dummyMessages3 = 
+  [
+    {
+      id: 5,
+      author: "jackyef3",
+      content: "Good thing that I have 3 accounts!",
+      timestamp: Date.now()
+    },
+    {
+      id: 6,
+      author: "jackyef3",
+      content: "What... instant read?",
+      timestamp: Date.now()+3
+    },
+    {
+      id: 7,
+      author: "jackyef3",
+      content: "So you did block me! FRIENDSHIP OVER!",
+      timestamp: Date.now()+5
+    },
+  ];
+
+var allMessages = {
+  1: dummyMessages1,
+  2: dummyMessages2,
+  3: dummyMessages3,
+};
+
+var entries = {
+  1: {
+    name: "jackyef",
+    id: 1,
+  },
+  2: {
+    name: "jackyef2",
+    id: 2,
+  },
+  3: {
+    name: "jackyef3",
+    id: 3,
+  }
+};
+
+var app = new Vue({
+  el: "#app",
+  data: {
+    currentEntryId: 0,
+    entries: entries,
+    textBox: "",
+  },
+  computed: {
+    messages: function(){
+      return allMessages[this.currentEntryId];
+    },
+    currentChatName: function(){
+      return this.entries[this.currentEntryId].name;
+    },
+    isTextBoxEmpty: function(){
+      return this.textBox.length <= 0;
+    },
+  },
+  methods: {
+    setEntryId: function(id){
+      console.log("clicked on entry with id:", id);
+      this.currentEntryId = id;
+    },
+    callAlert: function(message){
+      alert(message);
+    },
+    sendMessage: function(){
+      var msg = {};
+      msg.content = this.textBox;
+      msg.author = "user";
+      msg.id = uuidv4();
+      msg.timestamp = Date.now();
+      allMessages[this.currentEntryId].push(msg);
+      this.textBox = "";
+    },
+    addMessage: function(event){
+      this.message += event.key;
+    }
+  },
+  filters: {
+    uppercase: function(value){
+      return value.toUpperCase();
+    }
+  },
+  watch: {
+    currentEntryId: function(newId, oldId){
+      this.messages = allMessages[newId];
+    }
+  },
+
+  created: function(){
+    // this happen first
+    console.log("app created");
+  },
+  mounted: function(){
+    // then this happens
+    console.log("app mounted");
+  },
+  updated: function(){
+    // this happens whenever a DOM update occurs
+    console.log("app updated");
+  },
+  destroyed: function(){
+    //this happens when this.$destroy() is called
+    console.log("app destroyed");
+  }
+});
+
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  )
+}
+
+</script>
+<!-- Since there is already a rich ecosystem of ajax libraries    -->
+<!-- and collections of general-purpose utility methods, Vue core -->
+<!-- is able to remain small by not reinventing them. This also   -->
+<!-- gives you the freedom to just use what you're familiar with. -->
+<script src="https://unpkg.com/axios@0.12.0/dist/axios.min.js"></script>
+<script src="https://unpkg.com/lodash@4.13.1/lodash.min.js"></script>
+<!--<script>
+var watchExampleVM = new Vue({
+  el: '#watch-example',
+  data: {
+    question: '',
+    answer: 'I cannot give you an answer until you ask a question!'
+  },
+  watch: {
+    // whenever question changes, this function will run
+    question: function (newQuestion) {
+      this.answer = 'Waiting for you to stop typing...'
+      this.getAnswer()
+    }
+  },
+  methods: {
+    // _.debounce is a function provided by lodash to limit how
+    // often a particularly expensive operation can be run.
+    // In this case, we want to limit how often we access
+    // yesno.wtf/api, waiting until the user has completely
+    // finished typing before making the ajax request. To learn
+    // more about the _.debounce function (and its cousin
+    // _.throttle), visit: https://lodash.com/docs#debounce
+    getAnswer: _.debounce(
+      function () {
+        if (this.question.indexOf('?') === -1) {
+          this.answer = 'Questions usually contain a question mark. ;-)'
+          return
+        }
+        this.answer = 'Thinking...'
+        var vm = this
+        axios.get('https://yesno.wtf/api')
+          .then(function (response) {
+            vm.answer = _.capitalize(response.data.answer)
+            vm.imageUrl = response.data.image
+          })
+          .catch(function (error) {
+            vm.answer = 'Error! Could not reach the API. ' + error
+          })
+      },
+      // This is the number of milliseconds we wait for the
+      // user to stop typing.
+      500
+    )
+  }
+})
+</script>-->

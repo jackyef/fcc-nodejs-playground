@@ -10,12 +10,14 @@ const FacebookStrategy = require('passport-facebook');
 var app = express();
 var expressWs = require('express-ws')(app);
 const port = process.env.PORT || "8000";
-const mongoUrl = process.env.PROD_MONGODB;
+const mongoUrl = process.env.PROD_MONGODB ;
 
+var twitterApiKey = process.env.TWITTER_API_KEY ;
+var twitterApiSecret = process.env.TWITTER_API_SECRET ;
 // If you are seeing this and thought to yourself "Hey, free key!",
 // well, you're out of luck. This key only limits to 3 USD/month 
 // and it won't go over the limit at all 
-var bingApiKey = process.env.BING_API_KEY;
+var bingApiKey = process.env.BING_API_KEY ;
 
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
@@ -1092,8 +1094,6 @@ app.get('/book-app/trade/accept/:id', function (req, res){
 // start of pinterest-like app
 var Twitter = require('node-twitter-api');
 var shortid = require('shortid');
-var twitterApiKey = process.env.TWITTER_API_KEY;
-var twitterApiSecret = process.env.TWITTER_API_SECRET;
 var twitterApiUrl = "https://api.twitter.com/oauth";
 
 var twitter = new Twitter({
@@ -1253,3 +1253,10 @@ app.get('/pinterest-app/pin/delete/:id', function (req, res){
 });
 
 // end of pinterest-like app
+
+// start of chat-app
+app.get('/chat-app', function(req, res){
+  var data = {};
+  res.render('chat/index', data);
+});
+// end of chat-app
