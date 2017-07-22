@@ -50,7 +50,7 @@ html, body {
     /* fill this if needed */
 }
 .app-toolbar {
-    padding: .8em .5em .8em .5em;
+    padding: .2em .2em .2em .2em;
     /*vertical-align: baseline;*/
 }
 .app-toolbar-btn {
@@ -99,7 +99,7 @@ html, body {
     background-color: lightsteelblue;
 }
 .chat-toolbar {
-    padding: .8em .5em .8em .5em;
+    padding: .2em .2em .2em .2em;
     /*vertical-align: baseline;*/
 }
 .chat-title {
