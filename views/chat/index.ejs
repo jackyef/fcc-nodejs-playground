@@ -1,107 +1,66 @@
 <head>
   <title>vue chat-app</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1.0, minimum-scale=1.0, maximum-scale=1.0">
-  <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="stylesheet" href="css/watch-bootstrap.css">
+  <link rel="stylesheet" href="css/chat-bubble.css">
+  <link rel="stylesheet" href="css/vue-chat.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.js"></script>
   <script src="js/vue.js"></script>
-
-  <style>
-    html, body {
-      overflow: hidden;
-      height: 100%;
-      padding: 0;
-      margin: 0;
-    }
-    [v-cloak] {
-      display: none;
-    }
-    .loading{
-      width: 100%;
-      height: 100%;
-      background-color: #fcfcfc;
-      transition: opacity 1s;
-      opacity: 1;
-      z-index: 100;
-      background-color: #2a2a2a;
-    }
-    .loading-spinner{
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 101;
-      transition: opacity 1s;
-      opacity: 1;
-      color: #efefef;
-    }
-    .chat-entry{
-      padding: .5em;
-      border-bottom: 1px solid gray;
-    }
-    .chat-entry:hover{
-      filter: brightness(120%);
-    }
-    .sidebar, .content{
-      margin: 0 !important;
-      padding: 0 1em 1em 1em !important;
-      min-height: 100%;
-      height: 100%;
-    }
-    .sidebar {
-      overflow-y: scroll;
-      transition: 1s;
-    }
-    .sidebar-mobile{
-      width: 100%;
-      right: -100%;
-      position: absolute;
-      overflow-y: scroll;
-      z-index: 99;
-      transition: .6s;
-    }
-    .sidebar-mobile-toggle{
-      /* fill this if needed */
-    }
-    .content {
-      background-color: #f5f5f5;
-    }
-    .chat-window{
-      top: 6em;
-      left: .5em;
-      right: .5em;
-      bottom: 4.5em;
-      position: absolute;
-      overflow-y: scroll;
-      overflow-wrap: break-word;
-    }
-    .text-box {
-      bottom: 0;
-      height: 4em;
-      position: absolute;
-      padding-right: 1em;
-    }
-    ::-webkit-scrollbar { 
-      display: none; 
-    }
-  </style>
+  <script src="js/moment.min.js"></script>
+  <script src="js/mdb.min.js"></script>
 </head>
 <script>
 
 Vue.component("app-chat-entry", {
-  props: ['entry'],
-  template: `<div class="chat-entry bg-primary">
-                {{entry.name}}
-            </div>`
+  props: ['entry', 'lastMessage'],
+  template: `<div class="chat-entry">
+                <div class="row">
+                  <div class="col-xs-2">
+                    <div class="chat-entry-profile-pic-container">
+                      <img class="chat-entry-profile-pic" src="img/default-profile-pic.png">
+                    </div>
+                  </div>
+                  <div class="col-xs-10">
+                    <span class="chat-entry-name">
+                      {{entry.name}}
+                    </span>
+                    <br/>
+                    <span class="chat-entry-last-message">
+                      {{ lastMessage | truncate('30', '...') }}
+                    </span>
+                  </div>
+                </div>
+            </div>`,
+  filters: {
+    truncate: function(text, stop, clamp){
+      return text.slice(0, stop) + (stop < text.length ? clamp || '...' : '');
+    },
+  }
 });
 
 Vue.component("app-chat-bubble", {
   props: ['message'],
-  template: `<div class="chat-bubble">
-                {{message.author}}: {{message.content}}<br/>
-                {{message.timestamp}}
-            </div>`
+  template: `<div>
+              <div class="chat-bubble talk-bubble tri-right round">
+                <div class="talktext">
+                  <div class="chat-bubble-author">{{message.author}}</div>
+                  <p class="chat-bubble-content">{{message.content}}</p>
+                  <div class="chat-bubble-timestamp">{{message.timestamp | moment}}</div>
+                </div>
+              </div>
+            </div>`,
+  methods: {
+    moment: function(){
+      return moment();
+    },
+  },
+  filters: {
+    moment: function (date) {
+      return moment(date).format('D MMM YYYY, HH:mm:ss');
+    }
+  },
 })
 
 </script>
@@ -114,59 +73,111 @@ Vue.component("app-chat-bubble", {
           <h1><span class="fa fa-3x fa-circle-o-notch fa-spin"></span></h1>
         </div>
       </div>
-      <div class="col-sm-3 hidden-xs sidebar bg-primary">
+      <div class="col-sm-3 hidden-xs sidebar">
         <!-- sidebar -->
-        <h2>VueChat</h2>
-        <hr/>
-        <app-chat-entry 
-          v-for="entry in entries" 
-          :entry="entry"
-          :key="entry.id"
-          @click.native="setEntryId(entry.id)">
-        </app-chat-entry>
+        <div class="row bg-primary">
+          <div class="col-xs-12">
+            <div class="app-toolbar">
+              <span class="app-title">Conversations</sp>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="row chat-entries">
+              <app-chat-entry 
+                v-for="entry in entries" 
+                :entry="entry"
+                :last-message="allMessages[entry.id][allMessages[entry.id].length-1].content"
+                :key="entry.id"
+                @click.native="setEntryId(entry.id)">
+              </app-chat-entry>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="visible-xs sidebar sidebar-mobile bg-primary">
         <!-- sidebar mobile-->
-        <h2>Select a conversation...</h2>
-        <hr/>
-        <app-chat-entry 
-          v-for="entry in entries" 
-          :entry="entry"
-          :key="entry.id"
-          @click.native="setEntryId(entry.id)">
-        </app-chat-entry>
+        <div class="row bg-primary">
+          <div class="col-xs-12">
+            <div class="app-toolbar row">
+              <div class="col-xs-9">
+                <span class="app-title">Conversations</sp>
+              </div>
+              <div class="col-xs-2">
+                <span class="btn-group">
+                  <button class="app-toolbar-btn btn btn-primary visible-xs" @click="closeMobileSidebar"><i class="fa fa-times"></i></button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="row chat-entries">
+              <app-chat-entry 
+                v-for="entry in entries" 
+                :entry="entry"
+                :last-message="allMessages[entry.id][allMessages[entry.id].length-1].content"
+                :key="entry.id"
+                @click.native="setEntryId(entry.id)">
+              </app-chat-entry>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="col-sm-9 col-xs-12 content">
-        <!-- chat window -->
-        <h2 v-cloak v-if="currentEntryId">
-          <!-- sidebar mobile toggle -->
-          {{ currentChatName }}  
-          <span class="pull-right">
-            <span class="btn-group">
-              <button class="btn btn-primary visible-xs" @click="openMobileSidebar"><i class="fa fa-users"></i></button>
-            </span>
-          </span>
-          <div class="clearfix"></div>
-        </h2>
-        <h2 v-else>
-          VueChat!
-          <span class="pull-right">
-            <span class="btn-group">
-              <button class="btn btn-primary visible-xs" @click="openMobileSidebar"><i class="fa fa-users"></i></button>
-            </span>
-          </span>
-        </h2>
+        <!-- chat header -->
+        <div v-cloak v-if="currentEntryId" class="row bg-primary">
+          <div class="col-xs-12">
+            <div class="bg-primary chat-toolbar row">
+              <div class="col-xs-9">
+                <span class="chat-title">{{ currentChatName | truncate('20', '...')}}</span>  
+              </div>
+              <!-- sidebar mobile toggle -->
+              <div class="col-xs-2">
+                <span class="btn-group">
+                  <button class="chat-toolbar-btn btn btn-primary visible-xs" @click="openMobileSidebar"><i class="fa fa-bars"></i></button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="row bg-primary">
+          <div class="col-xs-12">
+            <div class="bg-primary chat-toolbar row">
+              <div class="col-xs-9">
+                <span class="chat-title">VueChat</span>  
+              </div>
+              <!-- sidebar mobile toggle -->
+              <div class="col-xs-2">
+                <span class="btn-group">
+                  <button class="chat-toolbar-btn btn btn-primary visible-xs" @click="openMobileSidebar"><i class="fa fa-bars"></i></button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <hr/>
+        <!-- chat window -->
         <div class="chat-window">
           <div class="col-xs-12" v-if="!currentEntryId">
-            <center>
-              This is still a prototype. No actual chat is being recorded yet.
-            </center>
+            <br/>
+            <div class="jumbotron">
+              <center>
+                This is still a prototype. No actual chat is being recorded yet.
+              </center>
+            </div>
           </div>
           <app-chat-bubble 
             v-for="message in messages"
+            :class="{
+                      'right-bubble': message.author == 'user',
+                      'left-bubble': message.author !== 'user',
+                      // 'left-in': message.author !== 'user',
+                      // 'right-in': message.author == 'user'
+                    }"
             :message="message"
             :key="message.id">
           </app-chat-bubble>
@@ -181,8 +192,8 @@ Vue.component("app-chat-bubble", {
               <input type="text" class="form-control" v-model="textBox">
 
               <span class="input-group-btn">
-                <button :disabled="isTextBoxEmpty" class="btn btn-success">
-                  send</button>
+                <button :disabled="isTextBoxEmpty" class="btn btn-info">
+                  <i class="fa fa-paper-plane"></i></button>
               </span>
             </div>
           </form>
@@ -203,8 +214,8 @@ var app = new Vue({
   data: {
     error: "",
     currentEntryId: 0,
-    entries: [],
-    allMessages: [],
+    entries: {},
+    allMessages: {},
     textBox: "",
   },
   computed: {
@@ -219,13 +230,22 @@ var app = new Vue({
     },
   },
   methods: {
+    moment: function(){
+      return moment();
+    },
     setEntryId: function(id){
       // console.log("clicked on entry with id:", id);
       this.currentEntryId = id;
 
       /* hide sidebar in mobile UI */
       var container = this.$el.querySelector(".sidebar-mobile");
-      container.style.right = "-100%";
+      container.style.right = "100%";
+      
+      Vue.nextTick(function () { 
+          // we need to use nextTick() to ensure we only scroll after the DOM finished updating
+          var container = app.$el.querySelector(".chat-window");
+          container.scrollTop = container.scrollHeight;
+      });
     },
     callAlert: function(message){
       alert(message);
@@ -244,21 +264,26 @@ var app = new Vue({
         console.log(response);
         app.allMessages[app.currentEntryId].push(msg);
         app.textBox = "";
+
+        Vue.nextTick(function () { 
+          // we need to use nextTick() to ensure we only scroll after the DOM finished updating
+          var container = app.$el.querySelector(".chat-window");
+          container.scrollTop = container.scrollHeight;
+        });
       })
       .catch(function (error) {
         console.log(error);
       });
 
-      Vue.nextTick(function () { 
-        // we need to use nextTick() to ensure we only scroll after the DOM finished updating
-        var container = app.$el.querySelector(".chat-window");
-        container.scrollTop = container.scrollHeight;
-      });
       
     },
     openMobileSidebar: function(){
       var container = this.$el.querySelector(".sidebar-mobile");
       container.style.right = "0%";
+    },
+    closeMobileSidebar: function(){
+      var container = this.$el.querySelector(".sidebar-mobile");
+      container.style.right = "100%";
     },
     addMessage: function(event){
       this.message += event.key;
@@ -267,7 +292,13 @@ var app = new Vue({
   filters: {
     uppercase: function(value){
       return value.toUpperCase();
-    }
+    },
+    moment: function (date) {
+      return moment(date).format('D MMM YYYY, h:mm');
+    },
+    truncate: function(text, stop, clamp){
+      return text.slice(0, stop) + (stop < text.length ? clamp || '...' : '');
+    },
   },
   watch: {
     currentEntryId: function(newId, oldId){
