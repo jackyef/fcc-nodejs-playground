@@ -1,0 +1,221 @@
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>freeCodeCamp nodeJS exercises playground</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <!--<link rel="stylesheet" href="/css/metro-bootstrap.css">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <style>
+            .social-buttons{
+            text-align: right;
+            }
+            a { 
+            text-decoration: none;
+            color: white !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>jackyef's nodejs playground</h1>
+            <p>
+                Below are the list of API created for freecodecamp exercises
+            </p>
+            <hr/>
+            <h3 class="header">
+                API Basejump: Request Header Parser microservice
+            </h3>
+            <blockquote>
+                User stories:
+                <ul>1) I can pass a string as a parameter, and it will check to see whether that string 
+                contains either a unix timestamp or a natural language date (example: January 1, 2016)</ul>
+                <ul>2) If it does, it returns both the Unix timestamp and the natural language form of that date.</ul>
+                <ul>3) If it does not contain a date or Unix timestamp, it returns null for those properties.</ul>
+            </blockquote>
+            <h4>Go to:</h4>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/api/timestamp/1450137600
+            </code>
+            <br/>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/api/timestamp/December%2015%2C%202015
+            </code>
+            <br>
+            <h4>Example output:</h4>
+            <code>
+                {
+                  "unix": 1450137600,
+                  "natural": "December 15, 2015"
+                }
+            </code>
+            <hr/>
+            <h3 class="header">
+                API Basejump: Request Header Parser microservice
+            </h3>
+            <h4>Go to:</h4>
+            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/whoami</code><br>
+            <h4>Example output:</h4>
+            <code>
+                {
+                  "ipaddress":"109.39.153.13",
+                  "language":"en-US",
+                  "software":"Windows NT 10.0; Win64; x64"
+                }
+            </code>
+    <hr/>
+            <h3 class="header">
+                API Basejump: URL-shortener microservice
+            </h3>
+            <h4>Go to:</h4>
+            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/shorten-url/https://www.google.com</code><br>
+            <h4>Example output:</h4>
+            <code>
+                {
+                  "original_url":"https://www.google.com",
+                  "short_url":"https://fcc-nodejs-playground-jackyef.herokuapp.com/api/shortened-url/237HAds"
+                }
+            </code><br/>
+            Then you can go to 
+            <code>
+            https://fcc-nodejs-playground-jackyef.herokuapp.com/api/shortened-url/237HAds
+            </code>
+            and be redirected to 
+            <code>
+            https://www.google.com
+            </code>
+    <hr/>
+    <h3 class="header">
+                API Basejump: Image Search API (Powered by Bing API)
+            </h3>
+            <h4>Use it like this:</h4>
+            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/image-search/[your-search-query-here]</code><br>
+            <h4>Example output:</h4>
+            <pre>[
+    {
+        "url": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=R8IBlTOjdg7OiiJ5E7ilu_qaKuN9RkUCiYuthfxIbJM&v=1&r=http%3a%2f%2fupload.wikimedia.org%2fwikipedia%2fcommons%2f3%2f37%2fWikipedia-lolcat.jpg&p=DevEx,5008.1",
+        "snippet": "Lolcat Internet Lolcat-musical aufgefhrt.",
+        "thumbnail": "https://tse3.mm.bing.net/th?id=OIP.4im_k8xNl17lU8k2RJaLSAEsDw&pid=Api",
+        "context": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=kgddTvZlGDEyjWVYoMkSbjnJ8m27rEZlVdDzUMZxxG8&v=1&r=http%3a%2f%2fimgarcade.com%2f1%2flolcat-internet&p=DevEx,5007.1"
+    },
+    {
+        "url": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=DZswcKsAandL2_jQyybNdWIzPgEow9_1F6gYZx6A6w4&v=1&r=http%3a%2f%2f1.bp.blogspot.com%2f_LvWzMHLToJ4%2fTHyP1jxIHyI%2fAAAAAAAABTo%2fjXyRYJkHojk%2fs1600%2fcute-lolcat-ears-hear-you.jpg&p=DevEx,5014.1",
+        "snippet": "Republic Of Durian: LOLcat",
+        "thumbnail": "https://tse4.mm.bing.net/th?id=OIP.l121UK0zVNAVa-NSZkdmAAEsDg&pid=Api",
+        "context": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=km7GgEx1nbxz_xgEJ5YM12iabiFpHonAb6qGzFEFnPA&v=1&r=http%3a%2f%2fivan-tai.blogspot.com%2f2010%2f08%2flolcat.html&p=DevEx,5013.1"
+    },
+    ...
+]</pre>
+            <h4>See search history here:</h4>
+            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/latest/image-search/</code><br>
+            <h4>Example of search history:</h4>
+<pre>[
+  {
+    "term": "lolcat",
+    "when": "2017-06-09T09:08:30.921Z"
+  },
+  {
+    "term": "freecodecamp",
+    "when": "2017-06-09T09:07:12.454Z"
+  },
+  ...
+]
+</pre>
+<hr/>
+            <h3 class="header">
+                API Basejump: File analyzer API
+            </h3>
+            <h4>Go to:</h4>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/api/upload-file
+            </code>
+            <br>
+            <h4>Example output (size is in bytes):</h4>
+            <code>
+                {
+                  "filename": "something.txt",
+                  "size": 2939
+                }
+            </code>
+            <hr/>
+             <h3 class="header">
+                Voting-app
+            </h3>
+            <h4>Go to:</h4>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/voting-app
+            </code>
+            <hr/>
+             <h3 class="header">
+                Nightlife-app
+            </h3>
+            <h4>Go to:</h4>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/nightlife-app
+            </code>
+            <hr/>
+            <h3 class="header">
+                Stock-app
+            </h3>
+            <h4>Go to:</h4>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/stock-app
+            </code>
+            <hr/>
+            <h3 class="header">
+                Book-app
+            </h3>
+            <h4>Go to:</h4>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/book-app
+            </code>
+            <hr/>
+            <h3 class="header">
+                Pinterest-app
+            </h3>
+            <h4>Go to:</h4>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/pinterest-app
+            </code>
+            <hr/>
+            <h3 class="header">
+                Vue-chat-app
+            </h3>
+            <h4>Go to:</h4>
+            <code>
+                https://fcc-nodejs-playground-jackyef.herokuapp.com/chat-app
+            </code>
+            <hr/>
+            <br/>
+    <hr/>
+  <div class="social-buttons">
+    by jackyef
+    <a href="https://github.com/jackyef/" target="_blank"><br/>
+      <button class="btn" style="background-color: rgb(36,41,46);">
+                        <span class="fa fa-github " style="min-width: 1em;"></span>
+                    </button></a>
+    <a href="http://codepen.io/jackyef/pens/public/" target="_blank">
+      <button class="btn" style="background-color: #111;">
+                        <span class="fa fa-codepen " style="min-width: 1em"></span>
+                    </button></a>
+    <a href="https://www.freecodecamp.com/jackyef" target="_blank">
+      <button class="btn" style="background-color: rgb(0,100,0);">
+                        <span class="fa fa-free-code-camp " style="min-width: 1em"></span>
+                    </button></a>
+    <a href="https://facebook.com/zhouyongchao" target="_blank">
+      <button class="btn" style="background-color: #3b5998;">
+                        <span class="fa fa-facebook " style="min-width: 1em"></span>
+                    </button></a>
+    <a href="https://instagram.com/jackyef_" target="_blank">
+      <button class="btn" style="background-color: #3F729B">
+                        <span class="fa fa-instagram " style="min-width: 1em"></span>
+                    </button></a>
+    <a href="https://www.linkedin.com/in/jacky-efendi-094643a1/" target="_blank">
+      <button class="btn" style="background-color: #0077B5;">
+                        <span class="fa fa-linkedin " style="min-width: 1em"></span>
+                    </button></a>
+  </div>
+        </div>
+        <br/>
+    </body>
+</html>

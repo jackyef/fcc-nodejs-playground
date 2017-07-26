@@ -1,221 +1,705 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>freeCodeCamp nodeJS exercises playground</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-        <!--<link rel="stylesheet" href="/css/metro-bootstrap.css">-->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
-        <style>
-            .social-buttons{
-            text-align: right;
-            }
-            a { 
-            text-decoration: none;
-            color: white !important;
-            }
-        </style>
-    </head>
-    <body>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Jackyef's Portfolio</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="css/freelancer.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top" class="index">
+<div id="skipnav"><a href="#maincontent">Skip to main content</a></div>
+
+    <!-- Navigation -->
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top navbar-custom">
         <div class="container">
-            <h1>jackyef's nodejs playground</h1>
-            <p>
-                Below are the list of API created for freecodecamp exercises
-            </p>
-            <hr/>
-            <h3 class="header">
-                API Basejump: Request Header Parser microservice
-            </h3>
-            <blockquote>
-                User stories:
-                <ul>1) I can pass a string as a parameter, and it will check to see whether that string 
-                contains either a unix timestamp or a natural language date (example: January 1, 2016)</ul>
-                <ul>2) If it does, it returns both the Unix timestamp and the natural language form of that date.</ul>
-                <ul>3) If it does not contain a date or Unix timestamp, it returns null for those properties.</ul>
-            </blockquote>
-            <h4>Go to:</h4>
-            <code>
-                https://fcc-nodejs-playground-jackyef.herokuapp.com/api/timestamp/1450137600
-            </code>
-            <br/>
-            <code>
-                https://fcc-nodejs-playground-jackyef.herokuapp.com/api/timestamp/December%2015%2C%202015
-            </code>
-            <br>
-            <h4>Example output:</h4>
-            <code>
-                {
-                  "unix": 1450137600,
-                  "natural": "December 15, 2015"
-                }
-            </code>
-            <hr/>
-            <h3 class="header">
-                API Basejump: Request Header Parser microservice
-            </h3>
-            <h4>Go to:</h4>
-            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/whoami</code><br>
-            <h4>Example output:</h4>
-            <code>
-                {
-                  "ipaddress":"109.39.153.13",
-                  "language":"en-US",
-                  "software":"Windows NT 10.0; Win64; x64"
-                }
-            </code>
-    <hr/>
-            <h3 class="header">
-                API Basejump: URL-shortener microservice
-            </h3>
-            <h4>Go to:</h4>
-            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/shorten-url/https://www.google.com</code><br>
-            <h4>Example output:</h4>
-            <code>
-                {
-                  "original_url":"https://www.google.com",
-                  "short_url":"https://fcc-nodejs-playground-jackyef.herokuapp.com/api/shortened-url/237HAds"
-                }
-            </code><br/>
-            Then you can go to 
-            <code>
-            https://fcc-nodejs-playground-jackyef.herokuapp.com/api/shortened-url/237HAds
-            </code>
-            and be redirected to 
-            <code>
-            https://www.google.com
-            </code>
-    <hr/>
-    <h3 class="header">
-                API Basejump: Image Search API (Powered by Bing API)
-            </h3>
-            <h4>Use it like this:</h4>
-            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/image-search/[your-search-query-here]</code><br>
-            <h4>Example output:</h4>
-            <pre>[
-    {
-        "url": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=R8IBlTOjdg7OiiJ5E7ilu_qaKuN9RkUCiYuthfxIbJM&v=1&r=http%3a%2f%2fupload.wikimedia.org%2fwikipedia%2fcommons%2f3%2f37%2fWikipedia-lolcat.jpg&p=DevEx,5008.1",
-        "snippet": "Lolcat Internet Lolcat-musical aufgefhrt.",
-        "thumbnail": "https://tse3.mm.bing.net/th?id=OIP.4im_k8xNl17lU8k2RJaLSAEsDw&pid=Api",
-        "context": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=kgddTvZlGDEyjWVYoMkSbjnJ8m27rEZlVdDzUMZxxG8&v=1&r=http%3a%2f%2fimgarcade.com%2f1%2flolcat-internet&p=DevEx,5007.1"
-    },
-    {
-        "url": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=DZswcKsAandL2_jQyybNdWIzPgEow9_1F6gYZx6A6w4&v=1&r=http%3a%2f%2f1.bp.blogspot.com%2f_LvWzMHLToJ4%2fTHyP1jxIHyI%2fAAAAAAAABTo%2fjXyRYJkHojk%2fs1600%2fcute-lolcat-ears-hear-you.jpg&p=DevEx,5014.1",
-        "snippet": "Republic Of Durian: LOLcat",
-        "thumbnail": "https://tse4.mm.bing.net/th?id=OIP.l121UK0zVNAVa-NSZkdmAAEsDg&pid=Api",
-        "context": "http://www.bing.com/cr?IG=2E61FD54A5474DB293FB60B8E138DE30&CID=09A39FC29787616F2B63955E96626005&rd=1&h=km7GgEx1nbxz_xgEJ5YM12iabiFpHonAb6qGzFEFnPA&v=1&r=http%3a%2f%2fivan-tai.blogspot.com%2f2010%2f08%2flolcat.html&p=DevEx,5013.1"
-    },
-    ...
-]</pre>
-            <h4>See search history here:</h4>
-            <code>https://fcc-nodejs-playground-jackyef.herokuapp.com/api/latest/image-search/</code><br>
-            <h4>Example of search history:</h4>
-<pre>[
-  {
-    "term": "lolcat",
-    "when": "2017-06-09T09:08:30.921Z"
-  },
-  {
-    "term": "freecodecamp",
-    "when": "2017-06-09T09:07:12.454Z"
-  },
-  ...
-]
-</pre>
-<hr/>
-            <h3 class="header">
-                API Basejump: File analyzer API
-            </h3>
-            <h4>Go to:</h4>
-            <code>
-                https://fcc-nodejs-playground-jackyef.herokuapp.com/api/upload-file
-            </code>
-            <br>
-            <h4>Example output (size is in bytes):</h4>
-            <code>
-                {
-                  "filename": "something.txt",
-                  "size": 2939
-                }
-            </code>
-            <hr/>
-             <h3 class="header">
-                Voting-app
-            </h3>
-            <h4>Go to:</h4>
-            <code>
-                https://fcc-nodejs-playground-jackyef.herokuapp.com/voting-app
-            </code>
-            <hr/>
-             <h3 class="header">
-                Nightlife-app
-            </h3>
-            <h4>Go to:</h4>
-            <code>
-                https://fcc-nodejs-playground-jackyef.herokuapp.com/nightlife-app
-            </code>
-            <hr/>
-            <h3 class="header">
-                Stock-app
-            </h3>
-            <h4>Go to:</h4>
-            <code>
-                https://fcc-nodejs-playground-jackyef.herokuapp.com/stock-app
-            </code>
-            <hr/>
-            <h3 class="header">
-                Book-app
-            </h3>
-            <h4>Go to:</h4>
-            <code>
-                https://fcc-nodejs-playground-jackyef.herokuapp.com/book-app
-            </code>
-            <hr/>
-            <h3 class="header">
-                Pinterest-app
-            </h3>
-            <h4>Go to:</h4>
-            <code>
-                https://fcc-nodejs-playground-jackyef.herokuapp.com/pinterest-app
-            </code>
-            <hr/>
-            <h3 class="header">
-                Vue-chat-app
-            </h3>
-            <h4>Go to:</h4>
-            <code>
-                https://fcc-nodejs-playground-jackyef.herokuapp.com/chat-app
-            </code>
-            <hr/>
-            <br/>
-    <hr/>
-  <div class="social-buttons">
-    by jackyef
-    <a href="https://github.com/jackyef/" target="_blank"><br/>
-      <button class="btn" style="background-color: rgb(36,41,46);">
-                        <span class="fa fa-github " style="min-width: 1em;"></span>
-                    </button></a>
-    <a href="http://codepen.io/jackyef/pens/public/" target="_blank">
-      <button class="btn" style="background-color: #111;">
-                        <span class="fa fa-codepen " style="min-width: 1em"></span>
-                    </button></a>
-    <a href="https://www.freecodecamp.com/jackyef" target="_blank">
-      <button class="btn" style="background-color: rgb(0,100,0);">
-                        <span class="fa fa-free-code-camp " style="min-width: 1em"></span>
-                    </button></a>
-    <a href="https://facebook.com/zhouyongchao" target="_blank">
-      <button class="btn" style="background-color: #3b5998;">
-                        <span class="fa fa-facebook " style="min-width: 1em"></span>
-                    </button></a>
-    <a href="https://instagram.com/jackyef_" target="_blank">
-      <button class="btn" style="background-color: #3F729B">
-                        <span class="fa fa-instagram " style="min-width: 1em"></span>
-                    </button></a>
-    <a href="https://www.linkedin.com/in/jacky-efendi-094643a1/" target="_blank">
-      <button class="btn" style="background-color: #0077B5;">
-                        <span class="fa fa-linkedin " style="min-width: 1em"></span>
-                    </button></a>
-  </div>
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="#page-top">Jackyef</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#portfolio">Portfolio</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#about">About</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#connect">Connect with me</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
         </div>
-        <br/>
-    </body>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <!-- Header -->
+    <header>
+        <div class="container" id="maincontent" tabindex="-1">
+            <div class="row">
+                <div class="col-lg-12">
+                    <img class="img-responsive" 
+                      style="border-radius: 50%; width: 256px; height: 256px;"
+                      src="img/portfolio/jackyef.jpg" alt="My profile picture">
+                    <div class="intro-text">
+                        <h1 class="name">Jacky Efendi</h1>
+                        <hr class="star-light">
+                        <span class="skills">Aspiring Web Developer, Software Engineer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Portfolio Grid Section -->
+    <section id="portfolio">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Portfolio</h2>
+                    <hr class="star-primary">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 portfolio-item">
+                    <a href="#portfolioModal1" class="portfolio-link" data-toggle="modal">
+                        <div class="caption">
+                            <div class="caption-content">
+                                <i class="fa fa-search-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="portfolio-img">
+                          <center>
+                              <img src="img/portfolio/als.png" class="img-responsive" alt="Asset Labeling System">
+                          </center>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-sm-4 portfolio-item">
+                    <a href="#portfolioModal2" class="portfolio-link" data-toggle="modal">
+                        <div class="caption">
+                            <div class="caption-content">
+                                <i class="fa fa-search-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="portfolio-img">
+                          <center>
+                              <img src="img/portfolio/laravelqa.png" class="img-responsive" alt="LaravelQA">
+                          </center>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-sm-4 portfolio-item">
+                    <a href="#portfolioModal3" class="portfolio-link" data-toggle="modal">
+                        <div class="caption">
+                            <div class="caption-content">
+                                <i class="fa fa-search-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="portfolio-img">
+                          <center>
+                              <img src="img/portfolio/voting-app.png" class="img-responsive" alt="Voting app">
+                          </center>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-sm-4 portfolio-item">
+                    <a href="#portfolioModal4" class="portfolio-link" data-toggle="modal">
+                        <div class="caption">
+                            <div class="caption-content">
+                                <i class="fa fa-search-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="portfolio-img">
+                          <center>
+                              <img src="img/portfolio/nightlife-app.png" class="img-responsive" alt="Nightlife app">
+                          </center>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-sm-4 portfolio-item">
+                    <a href="#portfolioModal5" class="portfolio-link" data-toggle="modal">
+                        <div class="caption">
+                            <div class="caption-content">
+                                <i class="fa fa-search-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="portfolio-img">
+                          <center>
+                              <img src="img/portfolio/stock-app.png" class="img-responsive" alt="Stock app">
+                          </center>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-sm-4 portfolio-item">
+                    <a href="#portfolioModal6" class="portfolio-link" data-toggle="modal">
+                        <div class="caption">
+                            <div class="caption-content">
+                                <i class="fa fa-search-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="portfolio-img">
+                          <center>
+                              <img src="img/portfolio/pinterest-app.png" class="img-responsive" alt="Pinterest app">
+                          </center>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-sm-4 portfolio-item">
+                    <a href="#portfolioModal7" class="portfolio-link" data-toggle="modal">
+                        <div class="caption">
+                            <div class="caption-content">
+                                <i class="fa fa-search-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="portfolio-img">
+                          <center>
+                              <img src="img/portfolio/chat-app.png" class="img-responsive" alt="Chat app">
+                          </center>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-sm-4 portfolio-item">
+                    <a href="#portfolioModal8" class="portfolio-link" data-toggle="modal">
+                        <div class="caption">
+                            <div class="caption-content">
+                                <i class="fa fa-search-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <div class="portfolio-img">
+                          <center>
+                              <img src="img/portfolio/cake.png" class="img-responsive" alt="Others">
+                          </center>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="success" id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>About Me</h2>
+                    <hr class="star-light">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-lg-offset-2">
+                    <p>
+                      A soon-to-be fresh graduate from <a style="color: white;" href="https://pcr.ac.id" target="_blank">Politeknik Caltex Riau</a> with a GPA of 3.97.
+                      <br/><br/>
+                      I am passionate about technology and how it can affect people's lives for the better. I am a quick learner and logical thinker. I also love to learn new things, especially interesting things that could make an impact in our daily life and change the way we live. 
+                      <br/>
+                    </p>
+                </div>
+                <div class="col-lg-4">
+                    <p>
+                      Also an aspiring web developer and software engineer. I really like the web platform because it is the easiest way to reach tons of people. 
+                      <br/>
+                      <br/>
+                      I am open to new career opportunities, contributing to open-source projects, and some freelance works.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <!--<section id="contact">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <div class="row">
+                        <div class="col-lg-12 text-center">
+                            <h2>Connect with Me</h2>
+                            <hr class="star-primary">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>-->
+
+    <!-- Footer -->
+    <footer class="text-center" id="connect">
+        <div class="footer-above">
+            <div class="container">
+                <div class="row">
+                    <div class="footer-col col-md-4">
+                        <h3>Location</h3>
+                        <p>Pekanbaru, Riau
+                            <br>Indonesia</p>
+                    </div>
+                    <div class="footer-col col-md-8">
+                        <h3>Around the Web</h3>
+                        <ul class="list-inline">
+                            <li>
+                                <a href="https://facebook.com/zhouyongchao" class="btn-social btn-outline"><span class="sr-only">Facebook</span><i class="fa fa-fw fa-facebook"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://plus.google.com/+Jackyefendi1" class="btn-social btn-outline"><span class="sr-only">Google Plus</span><i class="fa fa-fw fa-google-plus"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://instagram.com/_u/jackyef_" class="btn-social btn-outline"><span class="sr-only">Instagram</span><i class="fa fa-fw fa-instagram"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://linkedin.com/in/jackyef" class="btn-social btn-outline"><span class="sr-only">LinkedIn</span><i class="fa fa-fw fa-linkedin"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/jackyef" class="btn-social btn-outline"><span class="sr-only">GitHub</span><i class="fa fa-fw fa-github"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://codepen.io/jackyef/" class="btn-social btn-outline"><span class="sr-only">CodePen</span><i class="fa fa-fw fa-codepen"></i></a>
+                            </li>
+                            <li>
+                                <a href="http://jackyef.com" class="btn-social btn-outline"><span class="sr-only">Personal Blog</span><i class="fa fa-fw fa-globe"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-below">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        Copyright &copy; Jackyef 2017
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
+    <div class="scroll-top page-scroll hidden-sm visible-xs hidden-lg hidden-md">
+        <a class="btn btn-primary" href="#page-top">
+            <i class="fa fa-chevron-up"></i>
+        </a>
+    </div>
+
+    <!-- Portfolio Modals -->
+    <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Asset Labeling System</h2>
+                            <hr class="star-primary">
+                            <img src="img/portfolio/als.png" class="img-responsive img-centered" alt="Asset Labeling System">
+                            <p>This an Asset Labeling System developed as part of my internship.
+                              <br/><br/>Built using  CodeIgniter PHP Framework and MySQL.
+                              <br/><br/>Check out the <a href="http://jackyefubuntu16.southeastasia.cloudapp.azure.com/als" target="_blank">live-demo</a>. 
+                              <br/>Use <code>username/password: testuser/testuser123</code> to try it.
+                            </p>
+                            <ul class="list-inline item-details">
+                                <li>Client:
+                                    <strong><a href="https://www.facebook.com/pages/Gedung-Panca-Eka/196808257049353" target="_blank">Panca Eka Group (Intern)</a>
+                                    </strong>
+                                </li>
+                                <li>Date:
+                                    <strong><a href="javascipt:void(0)">June 2017</a>
+                                    </strong>
+                                </li>
+                                <li>Service:
+                                    <strong><a href="javascipt:void(0)">Web Development</a>
+                                    </strong>
+                                </li>
+                            </ul>
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Laravel Q&A</h2>
+                            <hr class="star-primary">
+                            <img src="img/portfolio/laravelqa.png" class="img-responsive img-centered" alt="">
+                            <p>A very simple questions and answers website built using Laravel 5 and MySQL.
+                              <br/>
+                              <br/>
+                              Built as a side-project in attempt to learn about Laravel 5 framework.
+                              <br/>
+                              <br/>
+                              Try it live <a href="http://jackyefubuntu16.southeastasia.cloudapp.azure.com/laravelqa/public/" target="_blank">here</a>.
+                            </p>
+                            <ul class="list-inline item-details">
+                                <li>Type:
+                                    <strong><a href="javascipt:void(0)">Hobby/Side-project</a>
+                                    </strong>
+                                </li>
+                                <li>Date:
+                                    <strong><a href="javascipt:void(0)">May 2017</a>
+                                    </strong>
+                                </li>
+                                <li>Service:
+                                    <strong><a href="javascipt:void(0)">Web Development</a>
+                                    </strong>
+                                </li>
+                                <li>More:
+                                    <strong><a href="http://jackyef.com/i-tried-learning-laravel-5-for-5-days-this-is-what-i-got/" target="_blank">Blog post</a>
+                                    </strong>
+                                </li>
+                            </ul>
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="portfolio-modal modal fade" id="portfolioModal3" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Voting app</h2>
+                            <hr class="star-primary">
+                            <img src="img/portfolio/voting-app.png" class="img-responsive img-centered" alt="">
+                            <p>A simple voting app built using NodeJS, ExpressJS, and MongoDB.
+                              <br/>
+                              <br/>
+                              Built as one of the freeCodeCamp back-end development projects.
+                              <br/>
+                              <br/>
+                              Used Google Charts API to generate pie graph based on the polling.
+                              <br/>
+                              <br/>
+                              Try it live <a href="/voting-app" target="_blank">here</a>.
+                           
+                            </p>
+                            <ul class="list-inline item-details">
+                                <li>My freeCodeCamp:
+                                    <strong><a href="https://www.freecodecamp.com/jackyef" target="_blank">jackyef</a>
+                                    </strong>
+                                </li>
+                                <li>Date:
+                                    <strong><a href="javascript:void(0)">June 2017</a>
+                                    </strong>
+                                </li>
+                                <li>Service:
+                                    <strong><a href="javascript:void(0)">Web Development, REST API</a>
+                                    </strong>
+                                </li>
+                            </ul>
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="portfolio-modal modal fade" id="portfolioModal4" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Nightlife Coordination app</h2>
+                            <hr class="star-primary">
+                            <img src="img/portfolio/nightlife-app.png" class="img-responsive img-centered" alt="">
+                            <p>A simple app built using NodeJS, ExpressJS, and MongoDB.
+                              <br/>
+                              <br/>
+                              Built as one of the freeCodeCamp back-end development projects.
+                              <br/>
+                              <br/>
+                              Utilized Yelp place search API and Facebook Login API to allow users to indicate whether they are going to a certain place or not.
+                              <br/>
+                              <br/>
+                              Try it live <a href="/nightlife-app" target="_blank">here</a>.
+                           
+                            </p>
+                            <ul class="list-inline item-details">
+                                <li>My freeCodeCamp:
+                                    <strong><a href="https://www.freecodecamp.com/jackyef" target="_blank">jackyef</a>
+                                    </strong>
+                                </li>
+                                <li>Date:
+                                    <strong><a href="javascript:void(0)">June 2017</a>
+                                    </strong>
+                                </li>
+                                <li>Tags:
+                                    <strong><a href="javascript:void(0)">Web Development, connecting with 3rd party API</a>
+                                    </strong>
+                                </li>
+                            </ul>
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="portfolio-modal modal fade" id="portfolioModal5" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Real-time Stock app</h2>
+                            <hr class="star-primary">
+                            <img src="img/portfolio/stock-app.png" class="img-responsive img-centered" alt="">
+                            <p>A simple app built using NodeJS, ExpressJS, and WebSockets.
+                              <br/>
+                              <br/>
+                              Built as one of the freeCodeCamp back-end development projects.
+                              <br/>
+                              <br/>
+                              Utilized AlphaVantage API to get the stock data. 
+                              <br/>
+                              <br/>
+                              If another user opens the app and adds another stock to track, changes will also be shown to all other current open connections in real-time.
+                              <br/>
+                              <br/>
+                              Try it live <a href="/stock-app" target="_blank">here</a>.
+                           
+                            </p>
+                            <ul class="list-inline item-details">
+                                <li>My freeCodeCamp:
+                                    <strong><a href="https://www.freecodecamp.com/jackyef" target="_blank">jackyef</a>
+                                    </strong>
+                                </li>
+                                <li>Date:
+                                    <strong><a href="javascript:void(0)">June 2017</a>
+                                    </strong>
+                                </li>
+                                <li>Tags:
+                                    <strong><a href="javascript:void(0)">Web Development, connecting with 3rd party API, WebSockets</a>
+                                    </strong>
+                                </li>
+                            </ul>
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="portfolio-modal modal fade" id="portfolioModal6" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Pinterest Clone app</h2>
+                            <hr class="star-primary">
+                            <img src="img/portfolio/pinterest-app.png" class="img-responsive img-centered" alt="">
+                            <p>A simple app built using NodeJS, ExpressJS, masonryjs, Twitter API, and MongoDB.
+                              <br/>
+                              <br/>
+                              Built as one of the freeCodeCamp back-end development projects.
+                              <br/>
+                              <br/>
+                              Utilized Twitter API for user logins. 
+                              <br/>
+                              <br/>
+                              Basically a poor-man version of pinterest. User can pin images by the image addresses and the web-app will show all the pins from every users. 
+                              <br/>
+                              Using masonryjs, the images will automatically fill available spaces.
+                              <br/>
+                              <br/>
+                              Try it live <a href="/pinterest-app" target="_blank">here</a>.
+                           
+                            </p>
+                            <ul class="list-inline item-details">
+                                <li>My freeCodeCamp:
+                                    <strong><a href="https://www.freecodecamp.com/jackyef" target="_blank">jackyef</a>
+                                    </strong>
+                                </li>
+                                <li>Date:
+                                    <strong><a href="javascript:void(0)">June 2017</a>
+                                    </strong>
+                                </li>
+                                <li>Tags:
+                                    <strong><a href="javascript:void(0)">Web Development, Social Login</a>
+                                    </strong>
+                                </li>
+                            </ul>
+                            <button id="btnSubmit" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="portfolio-modal modal fade" id="portfolioModal7" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Vue Chat app (WIP)</h2>
+                            <hr class="star-primary">
+                            <img src="img/portfolio/chat-app.png" class="img-responsive img-centered" alt="">
+                            <p>A web-based chat app built using NodeJS, ExpressJS, Vue.js, WebSockets, and MongoDB.
+                              <br/>
+                              <br/>
+                              Built as a side-projects to learn about Vue.js and real-time messaging app. 
+                              <br/>
+                              <br/>
+                              This is still a work in progress! It is not finished yet.
+                              <br/>
+                              <br/>
+                              Try it live <a href="/chat-app" target="_blank">here</a>.
+                           
+                            </p>
+                            <ul class="list-inline item-details">
+                                <li>Date:
+                                    <strong><a href="javascript:void(0)">July 2017 (ongoing)</a>
+                                    </strong>
+                                </li>
+                                <li>Tags:
+                                    <strong><a href="javascript:void(0)">Real-time Chat, Front-end Development</a>
+                                    </strong>
+                                </li>
+                            </ul>
+                            <button id="btnSubmit" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="portfolio-modal modal fade" id="portfolioModal8" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Others</h2>
+                            <hr class="star-primary">
+                            <img src="img/portfolio/cake.png" class="img-responsive img-centered" alt="">
+                            <p>
+                              I also built some API/microservices such as URL-shortener and Image Search API as part of
+                              freeCodeCamp courses.
+                              <br/>
+                              <br/>
+                              The full list can be look at <a href="/others.html" target="_blank">here</a>.
+                            </p>
+                            <ul class="list-inline item-details">
+                                <li>My freeCodeCamp:
+                                    <strong><a href="https://www.freecodecamp.com/jackyef" target="_blank">jackyef</a>
+                                    </strong>
+                                </li>
+                            </ul>
+                            <button id="btnSubmit" type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="js/jqBootstrapValidation.js"></script>
+    <script src="js/contact_me.js"></script>
+
+    <!-- Theme JavaScript -->
+    <script src="js/freelancer.min.js"></script>
+
+</body>
+
 </html>

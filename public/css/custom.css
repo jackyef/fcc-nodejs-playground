@@ -1,0 +1,11 @@
+.portfolio-img {
+  /*border: 2px solid mediumseagreen;*/
+  /*padding: 1px;*/
+  width: 100%;
+  height: 260px;
+}
+.portfolio-img img {
+  /*width: auto;*/
+  /*height: 254px;*/
+  max-height: 260px;
+}
