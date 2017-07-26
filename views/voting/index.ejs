@@ -4,7 +4,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
         <title><%= title %></title>
-        <link href="/css/bootstrap.css" rel="stylesheet" /> 
+        <link href="/css/watch-bootstrap.css" rel="stylesheet" /> 
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" /> 
 </head>
 <body>
@@ -40,7 +40,7 @@
         <h3>Existing polls</h3>
         <% polls.forEach(function(poll,i){ %>
           <div class="well well-sm">
-            <h4><a href="<%= ('poll/'+poll._id) %>"><%= poll.title %></a></h4>
+            <h4><a href="<%= ('/voting-app/poll/'+poll._id) %>"><%= poll.title %></a></h4>
             <small>- <%= poll.votes %> votes have been casted in this poll!</small>
             <% if (poll.username == session.username) { %>
             <div class="pull-right">
