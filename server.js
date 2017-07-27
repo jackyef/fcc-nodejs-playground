@@ -1398,7 +1398,7 @@ passport.use(new FacebookStrategy({
   function(accessToken, refreshToken, profile, cb){
     User.findOne({facebookId: profile.id}, function(err, user){
       if(err) throw(err);
-      if(!err && user!= null) return cb(null, user);
+      if(user != null) return cb(null, user);
 
       var user = new User({
           facebookId : profile.id,
