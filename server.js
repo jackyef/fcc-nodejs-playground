@@ -1375,7 +1375,7 @@ var VueChatUserSchema = new Schema({
     name: { type: String },
     photo: { type: String },
     email: { type: String, unique: true },
-    username: { type: String, lowercase: true, unique: true },
+    // username: { type: String, lowercase: true, unique: true },
     password: { type: String },
 });
 
