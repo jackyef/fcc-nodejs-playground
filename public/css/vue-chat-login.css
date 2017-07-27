@@ -19,12 +19,12 @@ html, body {
     text-align: center;
     text-decoration: uppercase;
 }
-.login-dialog button{
+.login-dialog .btn{
     margin: 1em 0 1em 0;
     opacity: .6;
-    transition: .3s cubic-bezier(0.215, 0.610, 0.355, 1);
+    transition: .3s ease-in-out;
 }
-.login-dialog button:hover, .login-dialog button:focus{
+.login-dialog .btn:hover, .login-dialog .btn:focus {
     opacity: .9;
 }
 .btn-fb{
@@ -35,7 +35,7 @@ html, body {
     border: none;
     margin: 1em 0 1em 0;
     opacity: .6;
-    transition: .3s cubic-bezier(0.215, 0.610, 0.355, 1);
+    transition: .3s ease-in-out;
 }
 
 .login-dialog input:hover{

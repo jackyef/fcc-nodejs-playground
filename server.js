@@ -502,8 +502,6 @@ var yelpApiId = process.env.YELP_API_ID ;
 var yelpApiSecret = process.env.YELP_API_SECRET ;
 var cachedToken;
 
-var fbAppId = process.env.FB_APP_ID ;
-var fbAppSecret = process.env.FB_APP_SECRET ;
 
 
 app.get('/nightlife-app', function (req, res){
@@ -671,28 +669,6 @@ app.get("/nightlife-app/api/getVisitors", function(req, res){
 
   });
 });
-
-// passport.use(new FacebookStrategy({
-//   clientID: fbAppId,
-//   clientSecret: fbAppSecret,
-//   callbackURL: "http://localhost:8000/auth/facebook/callback"
-// },
-//   function(accessToken, refreshToken, profile, cb){
-//     User.findOrCreate({facebookId: profile.id}, function(err, user){
-//       return cb(err, user);
-//     });
-//   }
-// ))
-
-// app.get('/auth/facebook',
-//   passport.authenticate('facebook'));
-
-// app.get('/auth/facebook/callback',
-//   passport.authenticate('facebook', { failureRedirect: '/nightlife-app' }),
-//   function(req, res) {
-//     // Successful authentication, redirect home.
-//     res.redirect('/nightlife-app');
-//   });
 
 // end of nightlife coordination app
 
@@ -1376,6 +1352,31 @@ app.get('/chat-app/login', function(req, res){
   var data = {};
   res.render('chat/login', data);
 });
+
+var vueChatFbAppId = process.env.VUECHAT_FB_APP_ID;
+var vueChatFbAppSecret = process.env.VUECHAT_FB_APP_SECRET;
+
+passport.use(new FacebookStrategy({
+  clientID: vueChatFbAppId,
+  clientSecret: vueChatFbAppSecret,
+  callbackURL: "/auth/facebook/callback"
+},
+  function(accessToken, refreshToken, profile, cb){
+    User.findOrCreate({facebookId: profile.id}, function(err, user){
+      return cb(err, user);
+    });
+  }
+))
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook', { scope: ['user_friends'] } ));
+
+app.get('/auth/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/chat-app/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/chat-app');
+  });
 
 app.get('/chat-app/initialData', function(req, res){
   var data = {};
