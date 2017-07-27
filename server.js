@@ -7,6 +7,8 @@ const moment = require('moment');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook');
 require('dotenv').config();
+var mongoose = require('mongoose');
+mongoose.connect(process.env.PROD_MONGODB, { useMongoClient: true });
 
 var app = express();
 var expressWs = require('express-ws')(app);
@@ -35,6 +37,8 @@ app.listen(port, function () {
   console.log(`fcc-nodejs-playground-jackyef is listening on port ${port}!`)
 });
 
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static('public'));
 app.disable('x-powered-by'); // for security
 app.use(cookieParser());
@@ -1345,6 +1349,12 @@ var entries = {
 
 app.get('/chat-app', function(req, res){
   var data = {};
+  if(!req.session.passport) {
+    res.redirect('/chat-app/login');
+    return;
+  }
+  data.passport = {};
+  data.passport.user = req.session.passport.user;
   res.render('chat/index', data);
 });
 
@@ -1355,21 +1365,60 @@ app.get('/chat-app/login', function(req, res){
 
 var vueChatFbAppId = process.env.VUECHAT_FB_APP_ID;
 var vueChatFbAppSecret = process.env.VUECHAT_FB_APP_SECRET;
+ 
+var Schema = mongoose.Schema, 
+  ObjectId = Schema.ObjectId;
 
+var VueChatUserSchema = new Schema({
+    id: { type: ObjectId },
+    facebookId: { type: String },
+    name: { type: String },
+    photo: { type: String },
+    email: { type: String, unique: true },
+    username: { type: String, lowercase: true, unique: true },
+    password: { type: String },
+});
+
+var User = mongoose.model('vuechat_user', VueChatUserSchema);
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
 passport.use(new FacebookStrategy({
   clientID: vueChatFbAppId,
   clientSecret: vueChatFbAppSecret,
-  callbackURL: "/auth/facebook/callback"
+  callbackURL: "/auth/facebook/callback",
+  enableProof: true,
+  profileFields : ['id', 'displayName', 'emails', 'photos'],
 },
   function(accessToken, refreshToken, profile, cb){
-    User.findOrCreate({facebookId: profile.id}, function(err, user){
-      return cb(err, user);
+    User.findOne({facebookId: profile.id}, function(err, user){
+      if(err) throw(err);
+      if(!err && user!= null) return cb(null, user);
+
+      var user = new User({
+          facebookId : profile.id,
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          photo: profile.photos[0].value,
+      });
+
+      user.save(function(err) {
+          if(err) throw err;
+          return cb(null, user);
+      });
+
+      // return cb(err, user);
     });
   }
 ))
 
 app.get('/auth/facebook',
-  passport.authenticate('facebook', { scope: ['user_friends'] } ));
+  passport.authenticate('facebook', { scope: ['email'] } ));
 
 app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/chat-app/login' }),
