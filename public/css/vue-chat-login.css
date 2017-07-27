@@ -1,0 +1,50 @@
+html, body {
+    overflow: hidden;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.login-dialog{
+    /*position: absolute;
+    top: 20%;*/
+    /*transform: translateY(-50%);*/
+    display: block;
+    background-color: rgba(30, 30, 30, .6);
+    margin-top: 10%;
+    color: #efefef;
+    padding: 2em;
+}
+.login-dialog h3{
+    text-align: center;
+    text-decoration: uppercase;
+}
+.login-dialog button{
+    margin: 1em 0 1em 0;
+    opacity: .6;
+    transition: .3s cubic-bezier(0.215, 0.610, 0.355, 1);
+}
+.login-dialog button:hover, .login-dialog button:focus{
+    opacity: .9;
+}
+.btn-fb{
+    background-color: #3b5998;
+    border-color: #3b5998;
+}
+.login-dialog input{
+    border: none;
+    margin: 1em 0 1em 0;
+    opacity: .6;
+    transition: .3s cubic-bezier(0.215, 0.610, 0.355, 1);
+}
+
+.login-dialog input:hover{
+    opacity: .9;
+}
+.login-dialog input:focus{
+    opacity: .9;
+}
+
+* {
+    /*border: 1px solid black;*/
+}

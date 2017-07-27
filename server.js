@@ -6,18 +6,19 @@ const session = require('express-session');
 const moment = require('moment');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook');
+require('dotenv').config();
 
 var app = express();
 var expressWs = require('express-ws')(app);
 const port = process.env.PORT || "8000";
-const mongoUrl = process.env.PROD_MONGODB ;
+const mongoUrl = process.env.PROD_MONGODB;
 
-var twitterApiKey = process.env.TWITTER_API_KEY;
-var twitterApiSecret = process.env.TWITTER_API_SECRET ;
+var twitterApiKey = process.env.TWITTER_API_KEY || "";
+var twitterApiSecret = process.env.TWITTER_API_SECRET || "";
 // If you are seeing this and thought to yourself "Hey, free key!",
 // well, you're out of luck. This key only limits to 3 USD/month 
 // and it won't go over the limit at all 
-var bingApiKey = process.env.BING_API_KEY ;
+var bingApiKey = process.env.BING_API_KEY || "";
 
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
@@ -1327,12 +1328,53 @@ var entries = {
   3: {
     name: "jackyef3",
     id: 3,
-  }
+  },
+  4: {
+    name: "jackyef",
+    id: 1,
+  },
+  5: {
+    name: "jackyef2",
+    id: 2,
+  },
+  6: {
+    name: "jackyef3",
+    id: 3,
+  },
+  7: {
+    name: "jackyef",
+    id: 1,
+  },
+  8: {
+    name: "jackyef2",
+    id: 2,
+  },
+  9: {
+    name: "jackyef3",
+    id: 3,
+  },
+  10: {
+    name: "jackyef",
+    id: 1,
+  },
+  11: {
+    name: "jackyef2",
+    id: 2,
+  },
+  12: {
+    name: "jackyef3",
+    id: 3,
+  },
 };
 
 app.get('/chat-app', function(req, res){
   var data = {};
   res.render('chat/index', data);
+});
+
+app.get('/chat-app/login', function(req, res){
+  var data = {};
+  res.render('chat/login', data);
 });
 
 app.get('/chat-app/initialData', function(req, res){
@@ -1349,5 +1391,23 @@ app.post('/chat-app/sendMessage', function(req, res){
   allMessages[entryId].push(msg);
   res.status(200);
   res.send();
+});
+
+app.ws('/chat-app/ws', function(ws, req) {
+  ws.on('message', function(msg) {
+    console.log("broadcasting message to all clients:", msg);
+    expressWs.getWss().clients.forEach(function(client,i){
+      if(client !== ws) client.send(msg);
+    });
+    var data = msg.split(':');
+    var action = data[0];
+    var symbol = data[1];
+    
+    if(action == "ADD"){
+      names.push(symbol);
+    } else if(action == "REMOVE") {
+      names.splice(names.indexOf(symbol), 1);
+    }
+  });
 });
 // end of chat-app

@@ -1,5 +1,5 @@
 <head>
-  <title>vue chat-app</title>
+  <title>VueChat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1.0, minimum-scale=1.0, maximum-scale=1.0">
   <link rel="stylesheet" href="css/watch-bootstrap.css">
   <link rel="stylesheet" href="css/chat-bubble.css">
@@ -9,7 +9,6 @@
   <script src="js/bootstrap.js"></script>
   <script src="js/vue.js"></script>
   <script src="js/moment.min.js"></script>
-  <script src="js/mdb.min.js"></script>
 </head>
 <script>
 
@@ -78,13 +77,13 @@ Vue.component("app-chat-bubble", {
         <div class="row bg-primary">
           <div class="col-xs-12">
             <div class="app-toolbar">
-              <span class="app-title">Conversations</sp>
+              <span class="app-title">{{ currentSidebarTitle }}</sp>
             </div>
           </div>
         </div>
         <div class="row">
-          <div class="col-xs-12">
-            <div class="row chat-entries">
+          <div v-if="currentSidebarViewId == 1" class="col-xs-12 sidebar-view">
+            <div class="row">
               <app-chat-entry 
                 v-for="entry in entries" 
                 :entry="entry"
@@ -94,7 +93,39 @@ Vue.component("app-chat-bubble", {
               </app-chat-entry>
             </div>
           </div>
+          
+          <div v-if="currentSidebarViewId == 2" class="col-xs-12 sidebar-view">
+            <div class="row">
+              <div class="jumbotron">
+                Your friends list will appear here.
+              </div>
+            </div>
+          </div>
+          
+          <div v-if="currentSidebarViewId == 3" class="col-xs-12 sidebar-view">
+            <div class="row">
+              <div class="jumbotron">
+                You can add new friends here.
+              </div>
+            </div>
+          </div>
         </div>
+        
+        <div v-if="loggedIn" class="nav-buttons row">
+          <div class="col-xs-3 nav-button bg-primary" @click="setSidebarView(1)">
+            <i class="fa fa-fw fa-comments"></i><br/><span class="nav-text">Chats</span>
+          </div>
+          <div class="col-xs-3 nav-button bg-primary" @click="setSidebarView(2)">
+            <i class="fa fa-fw fa-users"></i><br/><span class="nav-text">Friends</span>
+          </div>
+          <div class="col-xs-3 nav-button bg-primary" @click="setSidebarView(3)">
+            <i class="fa fa-fw fa-user-plus"></i><br/><span class="nav-text">Add</span>
+          </div>
+          <div class="col-xs-3 nav-button bg-primary" @click="logout()">
+            <i class="fa fa-fw fa-sign-out"></i><br/><span class="nav-text">Logout</span>
+          </div>
+        </div>
+
       </div>
       <div class="visible-xs sidebar sidebar-mobile bg-primary">
         <!-- sidebar mobile-->
@@ -102,19 +133,22 @@ Vue.component("app-chat-bubble", {
           <div class="col-xs-12">
             <div class="app-toolbar row">
               <div class="col-xs-9">
-                <span class="app-title">Conversations</sp>
+                <span class="app-title">{{ currentSidebarTitle }}</span>
               </div>
-              <div class="col-xs-2">
-                <span class="btn-group">
-                  <button class="app-toolbar-btn btn btn-primary visible-xs" @click="closeMobileSidebar"><i class="fa fa-times"></i></button>
-                </span>
+              <div class="col-xs-3">
+                <div class="pull-right">
+                  <span class="btn-group">
+                    <button class="app-toolbar-btn btn btn-primary visible-xs" @click="closeMobileSidebar"><i class="fa fa-times"></i></button>
+                  </span>
+                </div>
+                <div class="clearfix"></div>
               </div>
             </div>
           </div>
         </div>
         <div class="row">
-          <div class="col-xs-12">
-            <div class="row chat-entries">
+          <div v-if="currentSidebarViewId == 1" class="col-xs-12 sidebar-view">
+            <div class="row">
               <app-chat-entry 
                 v-for="entry in entries" 
                 :entry="entry"
@@ -124,7 +158,40 @@ Vue.component("app-chat-bubble", {
               </app-chat-entry>
             </div>
           </div>
+
+          <div v-if="currentSidebarViewId == 2" class="col-xs-12 sidebar-view">
+            <div class="row">
+              <div class="jumbotron">
+                Your friends list will appear here.
+              </div>
+            </div>
+          </div>
+          
+          <div v-if="currentSidebarViewId == 3" class="col-xs-12 sidebar-view">
+            <div class="row">
+              <div class="jumbotron">
+                You can add new friends here.
+              </div>
+            </div>
+          </div>
+          
         </div>
+        
+        <div v-if="loggedIn" class="nav-buttons row">
+          <div class="col-xs-3 nav-button bg-primary" @click="setSidebarView(1)">
+            <i class="fa fa-fw fa-comments"></i><br/><span class="nav-text">Chats</span>
+          </div>
+          <div class="col-xs-3 nav-button bg-primary" @click="setSidebarView(2)">
+            <i class="fa fa-fw fa-users"></i><br/><span class="nav-text">Friends</span>
+          </div>
+          <div class="col-xs-3 nav-button bg-primary" @click="setSidebarView(3)">
+            <i class="fa fa-fw fa-user-plus"></i><br/><span class="nav-text">Add</span>
+          </div>
+          <div class="col-xs-3 nav-button bg-primary" @click="logout()">
+            <i class="fa fa-fw fa-sign-out"></i><br/><span class="nav-text">Logout</span>
+          </div>
+        </div>
+
       </div>
 
       <div class="col-sm-9 col-xs-12 content">
@@ -136,10 +203,13 @@ Vue.component("app-chat-bubble", {
                 <span class="chat-title">{{ currentChatName | truncate('20', '...')}}</span>  
               </div>
               <!-- sidebar mobile toggle -->
-              <div class="col-xs-2">
-                <span class="btn-group">
-                  <button class="chat-toolbar-btn btn btn-primary visible-xs" @click="openMobileSidebar"><i class="fa fa-bars"></i></button>
-                </span>
+              <div class="col-xs-3">
+                <div class="pull-right">
+                  <span class="btn-group">
+                    <button class="chat-toolbar-btn btn btn-primary visible-xs" @click="openMobileSidebar"><i class="fa fa-bars"></i></button>
+                  </span>
+                </div>
+                <div class="clearfix"></div>
               </div>
             </div>
           </div>
@@ -151,10 +221,13 @@ Vue.component("app-chat-bubble", {
                 <span class="chat-title">VueChat</span>  
               </div>
               <!-- sidebar mobile toggle -->
-              <div class="col-xs-2">
-                <span class="btn-group">
-                  <button class="chat-toolbar-btn btn btn-primary visible-xs" @click="openMobileSidebar"><i class="fa fa-bars"></i></button>
-                </span>
+              <div class="col-xs-3">
+                <div class="pull-right">
+                  <span class="btn-group">
+                    <button class="chat-toolbar-btn btn btn-primary visible-xs" @click="openMobileSidebar"><i class="fa fa-bars"></i></button>
+                  </span>
+                </div>
+                <div class="clearfix"></div>
               </div>
             </div>
           </div>
@@ -214,9 +287,11 @@ var app = new Vue({
   data: {
     error: "",
     currentEntryId: 0,
+    currentSidebarViewId: 1, // 1 is the chats view
     entries: {},
     allMessages: {},
     textBox: "",
+    loggedIn: true,
   },
   computed: {
     messages: function(){
@@ -227,6 +302,14 @@ var app = new Vue({
     },
     isTextBoxEmpty: function(){
       return this.textBox.length <= 0;
+    },
+    currentSidebarTitle: function(){
+      switch(this.currentSidebarViewId){
+        case 1: return "Chats"; break;
+        case 2: return "Friends"; break;
+        case 3: return "Add Friend"; break;
+        default: break;
+      }
     },
   },
   methods: {
@@ -246,6 +329,12 @@ var app = new Vue({
           var container = app.$el.querySelector(".chat-window");
           container.scrollTop = container.scrollHeight;
       });
+    },
+    setSidebarView: function(id){
+      this.currentSidebarViewId = id;
+    },
+    logout: function(){
+      window.location.href = "/chat-app/login";
     },
     callAlert: function(message){
       alert(message);
