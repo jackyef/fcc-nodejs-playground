@@ -15,10 +15,7 @@ html, body {
     color: #efefef;
     padding: 2em;
 }
-.login-dialog h3{
-    text-align: center;
-    text-decoration: uppercase;
-}
+
 .login-dialog .btn{
     margin: 1em 0 1em 0;
     opacity: .6;

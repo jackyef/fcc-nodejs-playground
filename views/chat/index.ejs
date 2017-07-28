@@ -9,6 +9,24 @@
   <script src="js/bootstrap.js"></script>
   <script src="js/vue.js"></script>
   <script src="js/moment.min.js"></script>
+  <script type="text/javascript">
+    // fix for facebook auth callback
+    if (window.location.hash && window.location.hash == '#_=_') {
+        if (window.history && history.pushState) {
+            window.history.pushState("", document.title, window.location.pathname);
+        } else {
+            // Prevent scrolling by storing the page's current scroll offset
+            var scroll = {
+                top: document.body.scrollTop,
+                left: document.body.scrollLeft
+            };
+            window.location.hash = '';
+            // Restore the scroll offset, should be flicker free
+            document.body.scrollTop = scroll.top;
+            document.body.scrollLeft = scroll.left;
+        }
+    }
+</script>
 </head>
 <script>
 
@@ -106,8 +124,29 @@ Vue.component("app-chat-bubble", {
           
           <div v-if="currentSidebarViewId == 3" class="col-xs-12 sidebar-view">
             <div class="row">
-              <div class="jumbotron">
-                You can add new friends here.
+              <div class="col-xs-12">
+                <br/>
+                <p>You can search for your friends by email here.</p>
+                <div class="input-group">
+                  <input type="text" class="form-control" v-model="searchEmailQuery" />
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" @click="searchEmail">Search</button>
+                  </span>
+                </div>
+                <div id="email-search-result" v-if="searchEmailResult !== null">
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <img class="img img-responsive img-circle" :src="searchEmailResult.photo">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <h4>{{ searchEmailResult.name }}</h4>
+                        <p>{{ searchEmailResult.email }}</p>
+                        <button v-if="searchEmailResult.canAdd" class="btn btn-sm btn-success"><i class="fa fa-user-plus"></i> Add as friend</button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -203,8 +242,29 @@ Vue.component("app-chat-bubble", {
           
           <div v-if="currentSidebarViewId == 3" class="col-xs-12 sidebar-view">
             <div class="row">
-              <div class="jumbotron">
-                You can add new friends here.
+              <div class="col-xs-12">
+                <br/>
+                <p>You can search for your friends by email here.</p>
+                <div class="input-group">
+                  <input type="text" class="form-control" v-model="searchEmailQuery" />
+                  <span class="input-group-btn">
+                    <button class="btn btn-primary" @click="searchEmail">Search</button>
+                  </span>
+                </div>
+                <div id="email-search-result" v-if="searchEmailResult !== null">
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <img class="img img-responsive img-circle" :src="searchEmailResult.photo">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <h4>{{ searchEmailResult.name }}</h4>
+                        <p>{{ searchEmailResult.email }}</p>
+                        <button v-if="searchEmailResult.canAdd" class="btn btn-sm btn-success"><i class="fa fa-user-plus"></i> Add as friend</button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -320,18 +380,16 @@ Vue.component("app-chat-bubble", {
             :key="message.id">
           </app-chat-bubble>
         </div>
-
         <div class="text-box" v-if="currentEntryId">
           <form class="form-group"
             action="#"
             method="POST" 
             @submit.prevent="sendMessage">
             <div class="input-group">
-              <input type="text" class="form-control" v-model="textBox">
-
+              <input type="text" class="form-control" v-model="textBox" />
               <span class="input-group-btn">
                 <button :disabled="isTextBoxEmpty" class="btn btn-info">
-                  <i class="fa fa-paper-plane"></i></button>
+                  &nbsp;<i class="fa fa-paper-plane"></i>&nbsp;</button>
               </span>
             </div>
           </form>
@@ -357,6 +415,8 @@ var app = new Vue({
     allMessages: {},
     textBox: "",
     loggedIn: true,
+    searchEmailQuery: "",
+    searchEmailResult: null,
   },
   computed: {
     messages: function(){
@@ -429,8 +489,6 @@ var app = new Vue({
       .catch(function (error) {
         console.log(error);
       });
-
-      
     },
     openMobileSidebar: function(){
       var container = this.$el.querySelector(".sidebar-mobile");
@@ -439,6 +497,35 @@ var app = new Vue({
     closeMobileSidebar: function(){
       var container = this.$el.querySelector(".sidebar-mobile");
       container.style.right = "100%";
+    },
+    searchEmail: function(){
+      var query = this.searchEmailQuery;
+      axios.get(`/chat-app/searchEmail?email=${query}`)
+      .then(function (response) {
+        var error = response.data.error;
+        if(!error){
+          if(!response.data.user){
+            app.searchEmailResult = {
+              email: "",
+              photo: "/img/default-profile-pic.png",
+              name: "User not found",
+              canAdd: false,
+            };
+          } else {
+            app.searchEmailResult = response.data.user;
+          }
+          if(app.searchEmailResult.email == "<%= passport.user.email %>"){
+            // can't add yourself as friend
+            app.searchEmailResult.canAdd = false;
+          } else {
+            app.searchEmailResult.canAdd = true;
+          }
+          app.searchEmailQuery = "";
+        } 
+      })
+      .catch(function (error) {
+          app.searchEmailResult = null;
+      });
     },
     addMessage: function(event){
       this.message += event.key;

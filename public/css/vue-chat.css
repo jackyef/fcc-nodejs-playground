@@ -51,6 +51,7 @@ html, body {
 .sidebar-mobile-toggle{
     /* fill this if needed */
 }
+
 .app-toolbar {
     padding: .2em .2em .2em .2em;
     /*vertical-align: baseline;*/
@@ -74,6 +75,16 @@ html, body {
 }
 .sidebar-view .jumbotron {
     text-align: center;
+}
+
+#email-search-result {
+    padding: 1em;
+}
+#email-search-result img{
+    display:block;
+    margin: auto;
+    width: 6em;
+    height: 6em;
 }
 .chat-entry{
     padding: .5em;

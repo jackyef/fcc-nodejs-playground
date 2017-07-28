@@ -1435,6 +1435,25 @@ app.get('/chat-app/initialData', function(req, res){
   res.json(data);
 });
 
+app.get('/chat-app/searchEmail', function(req, res){
+  var data = {};
+  var email = req.query.email;
+  User.findOne({email: email}, function(err, user){
+      if(err) {
+        data.error = true;
+        data.message = "Some errors occured"; 
+      }
+      if(!user) {
+        data.error = false;
+        data.message = "The email address doesn't belong to any account in VueChat";
+      }
+      data.user = user;
+       
+      res.status(200);
+      res.json(data);
+    });
+});
+
 app.post('/chat-app/sendMessage', function(req, res){
   var entryId = req.body.entryId;
   var msg = req.body.message;
