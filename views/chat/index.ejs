@@ -149,6 +149,9 @@ Vue.component("app-friend-entry", {
                 :key="friend.id"
                 @click.native="">
               </app-friend-entry>
+              <div class="jumbotron" v-if="currentUser.friends.length > 0">
+                Your friends will appear here if you had any.
+              </div>
             </div>
           </div>
           
@@ -265,8 +268,14 @@ Vue.component("app-friend-entry", {
 
           <div v-if="currentSidebarViewId == 2" class="col-xs-12 sidebar-view">
             <div class="row">
-              <div class="jumbotron">
-                Your friends list will appear here.
+              <app-friend-entry 
+                v-for="friend in currentUser.friends" 
+                :friend="friend"
+                :key="friend.id"
+                @click.native="">
+              </app-friend-entry>
+              <div class="jumbotron" v-if="currentUser.friends.length > 0">
+                Your friends will appear here if you had any.
               </div>
             </div>
           </div>
