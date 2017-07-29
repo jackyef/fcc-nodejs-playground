@@ -78,7 +78,34 @@ Vue.component("app-chat-bubble", {
       return moment(date).format('D MMM YYYY, HH:mm:ss');
     }
   },
-})
+});
+
+Vue.component("app-friend-entry", {
+  props: ['friend'],
+  template: `<div class="chat-entry">
+                <div class="row">
+                  <div class="col-xs-2">
+                    <div class="chat-entry-profile-pic-container">
+                      <img class="chat-entry-profile-pic" :src="friend.photo">
+                    </div>
+                  </div>
+                  <div class="col-xs-10">
+                    <span class="chat-entry-name">
+                      {{ friend.name }}
+                    </span>
+                    <br/>
+                    <span class="chat-entry-last-message">
+                      {{ friend.email }}
+                    </span>
+                  </div>
+                </div>
+            </div>`,
+  filters: {
+    truncate: function(text, stop, clamp){
+      return text.slice(0, stop) + (stop < text.length ? clamp || '...' : '');
+    },
+  }
+});
 
 </script>
 
@@ -116,9 +143,12 @@ Vue.component("app-chat-bubble", {
           
           <div v-if="currentSidebarViewId == 2" class="col-xs-12 sidebar-view">
             <div class="row">
-              <div class="jumbotron">
-                Your friends list will appear here.
-              </div>
+              <app-friend-entry 
+                v-for="friend in currentUser.friends" 
+                :friend="friend"
+                :key="friend.id"
+                @click.native="">
+              </app-friend-entry>
             </div>
           </div>
           
@@ -143,7 +173,8 @@ Vue.component("app-chat-bubble", {
                     <div class="col-xs-12 text-center">
                         <h4>{{ searchEmailResult.name }}</h4>
                         <p>{{ searchEmailResult.email }}</p>
-                        <button v-if="searchEmailResult.canAdd" class="btn btn-sm btn-success"><i class="fa fa-user-plus"></i> Add as friend</button>
+                        <button v-if="searchEmailResult.canAdd" class="btn btn-sm btn-success" @click="addFriend" :disabled="isAddingFriend"><i class="fa fa-user-plus"></i> Add as friend</button>
+                        <p v-if="searchEmailResult.isFriendAlready">Already added as friend.</p>
                     </div>
                   </div>
                 </div>
@@ -261,7 +292,8 @@ Vue.component("app-chat-bubble", {
                     <div class="col-xs-12 text-center">
                         <h4>{{ searchEmailResult.name }}</h4>
                         <p>{{ searchEmailResult.email }}</p>
-                        <button v-if="searchEmailResult.canAdd" class="btn btn-sm btn-success"><i class="fa fa-user-plus"></i> Add as friend</button>
+                        <button v-if="searchEmailResult.canAdd" class="btn btn-sm btn-success" @click="addFriend"><i class="fa fa-user-plus"></i> Add as friend</button>
+                        <p v-if="searchEmailResult.isFriendAlready">Already added as friend.</p>
                     </div>
                   </div>
                 </div>
@@ -415,8 +447,10 @@ var app = new Vue({
     allMessages: {},
     textBox: "",
     loggedIn: true,
+    currentUser: <%- JSON.stringify(passport.user) %>,
     searchEmailQuery: "",
     searchEmailResult: null,
+    isAddingFriend: false,
   },
   computed: {
     messages: function(){
@@ -499,7 +533,7 @@ var app = new Vue({
       container.style.right = "100%";
     },
     searchEmail: function(){
-      var query = this.searchEmailQuery;
+      var query = this.searchEmailQuery.toLowerCase();
       axios.get(`/chat-app/searchEmail?email=${query}`)
       .then(function (response) {
         var error = response.data.error;
@@ -510,21 +544,45 @@ var app = new Vue({
               photo: "/img/default-profile-pic.png",
               name: "User not found",
               canAdd: false,
+              isFriendAlready: false,
             };
           } else {
             app.searchEmailResult = response.data.user;
+            app.searchEmailResult.canAdd = true;
           }
           if(app.searchEmailResult.email == "<%= passport.user.email %>"){
             // can't add yourself as friend
             app.searchEmailResult.canAdd = false;
-          } else {
-            app.searchEmailResult.canAdd = true;
           }
+          app.currentUser.friends.forEach((friend,i) => {
+            // can't add a friend twice
+            if(friend.email == app.searchEmailResult.email) {
+              app.searchEmailResult.canAdd = false;
+              app.searchEmailResult.isFriendAlready = true;
+            }
+          });
+          // if(app.currentUser.friends.indexOf(app.searchEmailResult.email) > -1){
+          //   app.searchEmailResult.canAdd = false;
+          // }
           app.searchEmailQuery = "";
         } 
       })
       .catch(function (error) {
-          app.searchEmailResult = null;
+        app.searchEmailResult = null;
+      });
+    },
+    addFriend: function(){
+      this.isAddingFriend = true;
+      var toAdd = this.searchEmailResult.email;
+      axios.get(`/chat-app/addFriend?email=${toAdd}&currentUserEmail=${app.currentUser.email}`)
+      .then(function (response) {
+        app.isAddingFriend = false;
+        app.currentUser.friends.push(response.data.friend);
+        app.$set(app.searchEmailResult, 'canAdd', false);
+        app.$set(app.searchEmailResult, 'isFriendAlready', true);
+      })
+      .catch(function (error) {
+        // do something if adding failed
       });
     },
     addMessage: function(event){
@@ -576,6 +634,15 @@ var app = new Vue({
         var container = app.$el.querySelector(".loading");
         var loader = app.$el.querySelector(".loading-spinner");
         loader.innerHTML = "Error initializing the web-app! Please reload the web-app :(";
+      });
+
+      axios.get(`/chat-app/searchEmail?email=${this.currentUser.email}`)
+      .then(function (response) {
+        app.currentUser = response.data.user;
+
+      })
+      .catch(function (error) {
+        app.error = 'Error! Could not reach the API. ' + error;
       });
   },
   updated: function(){

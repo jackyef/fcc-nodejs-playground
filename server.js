@@ -11,6 +11,7 @@ var mongoose = require('mongoose');
 mongoose.connect(process.env.PROD_MONGODB, { useMongoClient: true });
 
 var app = express();
+app.disable('etag');
 var expressWs = require('express-ws')(app);
 const port = process.env.PORT || "8000";
 const mongoUrl = process.env.PROD_MONGODB;
@@ -1370,11 +1371,12 @@ var Schema = mongoose.Schema,
   ObjectId = Schema.ObjectId;
 
 var VueChatUserSchema = new Schema({
-    id: { type: ObjectId },
+    // id: { type: ObjectId },
     facebookId: { type: String },
     name: { type: String },
     photo: { type: String },
     email: { type: String, unique: true },
+    friends: {type: Array },
     // username: { type: String, lowercase: true, unique: true },
     password: { type: String },
 });
@@ -1393,18 +1395,22 @@ passport.use(new FacebookStrategy({
   clientSecret: vueChatFbAppSecret,
   callbackURL: "/auth/facebook/callback",
   enableProof: true,
-  profileFields : ['id', 'displayName', 'emails', 'photos'],
+  profileFields : ['id', 'displayName', 'emails', 'picture.type(square)'],
 },
   function(accessToken, refreshToken, profile, cb){
+    
+
     User.findOne({facebookId: profile.id}, function(err, user){
+      // console.log(profile);
+      // console.log(user);
       if(err) throw(err);
       if(user != null) return cb(null, user);
-
+      
       var user = new User({
-          facebookId : profile.id,
-          name: profile.displayName,
-          email: profile.emails[0].value,
-          photo: profile.photos[0].value,
+        facebookId : profile.id,
+        name: profile.displayName,
+        email: profile.emails[0].value.toLowerCase(),
+        photo: profile.photos[0].value,
       });
 
       user.save(function(err) {
@@ -1452,6 +1458,38 @@ app.get('/chat-app/searchEmail', function(req, res){
       res.status(200);
       res.json(data);
     });
+});
+
+app.get('/chat-app/addFriend', function(req, res){
+  var data = {};
+  var email = req.query.email;
+  var currentUserEmail = req.query.currentUserEmail;
+
+  User.findOne( {email: email}, function(err, friend){
+    User.findOne({email: currentUserEmail}, function(err, user){
+      if(err) {
+        data.error = true;
+        data.message = "Some errors occured"; 
+      }
+      if(!user) {
+        data.error = false;
+        data.message = "The email address doesn't belong to any account in VueChat";
+      }
+      if(!user.friends) user.friends = [];
+      data.friend = {};
+      data.friend.facebookId = friend.facebookId;
+      data.friend.name = friend.name;
+      data.friend.photo = friend.photo;
+      data.friend.email = friend.email;
+
+      user.friends.push(data.friend);
+      user.save(function(err){
+        if(err) res.status(405);
+        else res.status(200);
+        res.json(data);
+      });
+    });
+  });
 });
 
 app.post('/chat-app/sendMessage', function(req, res){
