@@ -149,7 +149,7 @@ Vue.component("app-friend-entry", {
                 :key="friend.id"
                 @click.native="">
               </app-friend-entry>
-              <div class="jumbotron" v-if="currentUser.friends.length > 0">
+              <div class="jumbotron" v-if="currentUser.friends.length <= 0">
                 Your friends will appear here if you had any.
               </div>
             </div>
@@ -274,7 +274,7 @@ Vue.component("app-friend-entry", {
                 :key="friend.id"
                 @click.native="">
               </app-friend-entry>
-              <div class="jumbotron" v-if="currentUser.friends.length > 0">
+              <div class="jumbotron" v-if="currentUser.friends.length <= 0">
                 Your friends will appear here if you had any.
               </div>
             </div>
