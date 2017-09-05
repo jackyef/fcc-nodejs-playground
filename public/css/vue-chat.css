@@ -176,9 +176,6 @@ html, body {
 .chat-bubble{
     display: block;
 }
-.talk-text {
-    display: inline-block;
-}
 .chat-bubble-author{
     font-weight: 700;
 }
