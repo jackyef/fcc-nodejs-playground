@@ -176,6 +176,7 @@ html, body {
 .chat-bubble{
     display: block;
     max-width: 100%;
+    word-wrap: break-word;
 }
 .chat-bubble-author{
     font-weight: 700;
