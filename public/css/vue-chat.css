@@ -174,14 +174,13 @@ html, body {
 }
 
 .chat-bubble{
-    display: block;
+    display: inline-block;
 }
 .chat-bubble-author{
     font-weight: 700;
 }
 .chat-bubble-content{
     padding: .3em;
-    display: inline-block;
     word-wrap: break-word;
 }
 .chat-bubble-timestamp{
