@@ -177,6 +177,11 @@ html, body {
     display: block;
     max-width: 100%;
     word-wrap: break-word;
+    word-break: break-word;
+   -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+       -ms-hyphens: auto;
+           hyphens: auto;
 }
 .chat-bubble-author{
     font-weight: 700;
