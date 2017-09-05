@@ -244,6 +244,7 @@
   text-align: left;
   line-height: 1.5em;
 	display: inline-block;
+	max-width: 100%;
 }
 .talktext p{
   /* remove webkit p margins */
