@@ -1525,4 +1525,4 @@ app.ws('/chat-app/ws', function(ws, req) {
 
 app.use('/react-youtube-lite/', express.static('public/react-youtube-lite'));
 
-// end of react-youtube-lite
+// end of react-youtube-lites
