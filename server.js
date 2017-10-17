@@ -1236,6 +1236,7 @@ app.get('/pinterest-app/pin/delete/:id', function (req, res){
 
 // end of pinterest-like app
 
+
 // start of chat-app
 
 
@@ -1518,3 +1519,10 @@ app.ws('/chat-app/ws', function(ws, req) {
   });
 });
 // end of chat-app
+
+
+// start of react-youtube-lite
+
+app.use('/react-youtube-lite/', express.static('public/react-youtube-lite'));
+
+// end of react-youtube-lite
